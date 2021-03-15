@@ -11,8 +11,8 @@ SpringBoot整合框架各种实用的组件技术点，纯属个人技术积累�
 ### 各技术点预览目录
 | 组件名称 | 版本号 | 描述 |
 | ------- | ----- | ---- |
-| SpringBoot-ActiveMQ | activemq-all v5.15.5 | 简单实例(activemq-demo)、整合Redis(activemq-redis) |
-| SpringBoot-Admin | spring-cloud Finchley.SR2 | Spring Boot Admin是一个开源社区项目，用于管理和监控SpringBoot应用程序 |
+| SpringBoot-ActiveMQ | --- | 简单实例(activemq-demo)、整合Redis(activemq-redis) |
+| SpringBoot-Admin | --- | Spring Boot Admin是一个开源社区项目，用于管理和监控SpringBoot应用程序 |
 | SpringBoot-Cache | spring-boot-starter-cache | 集成Caffeine的两种方式 |
 | SpringBoot-Chart | jfreechart v1.0.13 | JFreeChart是JAVA平台上的一个开放的图表绘制类库 |
 | SpringBoot-Date-Jpa | spring-boot-starter-data-jpa | 整合Jpa实现简单的增、删、改、查 |
