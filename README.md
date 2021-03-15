@@ -18,7 +18,7 @@ SpringBoot整合框架各种实用的组件技术点，纯属个人技术积累�
 | SpringBoot-Date-Jpa | ----- | 整合Jpa实现简单的增、删、改、查 |
 | SpringBoot-Docker | ----- | Docker中部署SpringBoot项目 |
 | SpringBoot-Dubbo | ----- | Apache Dubbo（孵化）是一个由阿里巴巴开源的基于Java的高性能RPC框架 |
-| SpringBoot-Elasticsearch | --- | 集成Elasticsearch的简单实例 |
+| SpringBoot-Elasticsearch | ----- | 集成Elasticsearch的简单实例 |
 | SpringBoot-Excel | ----- | 集成POI对excel导入导出的简单实例 |
 | SpringBoot-Mail | ----- | 集成jodd发送邮件 |
 | SpringBoot-MongoDB | ----- | 集成mongodb的简单实例 |
