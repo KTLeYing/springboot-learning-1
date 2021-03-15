@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mzl.zfbpaydemo2.dao.OrderRefundDao">
+
+    <!--添加退款记录-->
+    <insert id="insert">
+        insert into order_refund
+        values(#{refundId}, #{orderId}, #{money}, #{account}, #{reason}, #{refundDate})
+    </insert>
+
+    <!--查询所有的退款信息-->
+    <select id="selectList" resultType="com.mzl.zfbpaydemo2.entity.OrderRefund">
+        select * from order_refund
+        where refund_id = #{refundId} or order_id = #{orderId}
+    </select>
+
+</mapper>

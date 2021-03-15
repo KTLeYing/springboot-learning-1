@@ -1,0 +1,21 @@
+2020-11-11 20:52:10.432 [restartedMain] INFO  com.mzl.logbackdemo2.LogbackDemo2Application - Starting LogbackDemo2Application on LAPTOP-FK4AGT9C with PID 20940 (D:\IDEA\Idea-workplace\logback-demo2\target\classes started by 21989 in D:\IDEA\Idea-workplace\logback-demo2)
+2020-11-11 20:52:10.444 [restartedMain] INFO  com.mzl.logbackdemo2.LogbackDemo2Application - No active profile set, falling back to default profiles: default
+2020-11-11 20:52:10.523 [restartedMain] INFO  o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2020-11-11 20:52:10.524 [restartedMain] INFO  o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2020-11-11 20:52:11.649 [restartedMain] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http)
+2020-11-11 20:52:11.660 [restartedMain] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2020-11-11 20:52:11.661 [restartedMain] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2020-11-11 20:52:11.661 [restartedMain] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.39]
+2020-11-11 20:52:11.756 [restartedMain] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2020-11-11 20:52:11.757 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1231 ms
+2020-11-11 20:52:11.927 [restartedMain] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'applicationTaskExecutor'
+2020-11-11 20:52:12.069 [restartedMain] INFO  o.s.b.d.autoconfigure.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2020-11-11 20:52:12.080 [restartedMain] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2020-11-11 20:52:12.099 [restartedMain] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (http) with context path ''
+2020-11-11 20:52:12.107 [restartedMain] INFO  com.mzl.logbackdemo2.LogbackDemo2Application - Started LogbackDemo2Application in 2.259 seconds (JVM running for 4.192)
+2020-11-11 20:52:24.388 [http-nio-8080-exec-1] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2020-11-11 20:52:24.388 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2020-11-11 20:52:24.393 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 5 ms
+2020-11-11 20:52:24.420 [http-nio-8080-exec-1] INFO  com.mzl.logbackdemo2.controller.LogbackController - 日志输出 info
+2020-11-11 20:52:24.420 [http-nio-8080-exec-1] WARN  com.mzl.logbackdemo2.controller.LogbackController - 日志输出 warn
+2020-11-11 20:52:24.420 [http-nio-8080-exec-1] ERROR com.mzl.logbackdemo2.controller.LogbackController - 日志输出 error

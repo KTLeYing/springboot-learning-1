@@ -1,0 +1,10 @@
+server:
+  port: 8081
+
+# ES
+spring:
+  data:
+    elasticsearch:
+      cluster-nodes: 127.0.0.1:9300 #192.168.0.148:9200
+      cluster-name: typ
+

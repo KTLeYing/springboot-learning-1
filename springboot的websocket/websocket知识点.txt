@@ -1,0 +1,15 @@
+【WebSocketServer实现核心】
+1、因为WebSocket是类似客户端服务端的形式(采用ws协议)，那么这里的WebSocketServer其实就相当于一个ws协议的Controller
+2、直接@ServerEndpoint("/imserver/{userId}") 、@Component启用即可，然后在里面实现@OnOpen开启连接，@onClose关闭连接，@onMessage接收消息等方法。
+3、新建一个ConcurrentHashMap webSocketMap 用于接收当前userId的WebSocket，方便IM之间对userId进行推送消息。单机版实现到这里就可以。key是用户id，唯一标识，value是当前的websocket类对象，里面有session，或者value直接是session，session用来进行会话发送消息的，里面包括用户的所有各种信息的跟踪记录（与我们的以前的session有点不同）。
+4、集群版（多个ws节点）还需要借助mysql或者redis等进行处理，改造对应的sendMessage方法即可。
+5、key是用户id，value是当前的websocket对象，里面有session
+
+【@Component和@ServerEndpoint关于是否单例模式，能否使用static Map等一些问题的解答】
+1、websocket是原型模式，@ServerEndpoint每次建立双向通信的时候都会创建一个实例，区别于spring的单例模式。
+2、Spring的@Component默认是单例模式，请注意，默认 而已，是可以被改变的。
+3、这里的@Component仅仅为了支持@Autowired依赖注入使用，如果不加则不能注入任何东西，为了方便。
+4、什么是prototype 原型模式？ 基本就是你需要从A的实例得到一份与A内容相同，但是又互不干扰的实例B的话，就需要使用原型模式。
+5、关于在原型模式下使用static 的webSocketMap，请注意这是ConcurrentHashMap ，也就是线程安全/线程同步的，而且已经是静态变量作为全局调用，这种情况下是ok的，或者大家如果有顾虑或者更好的想法的化，可以进行改进。 例如使用一个中间类来接收和存放session。
+6、为什么每次都@OnOpen都要检查webSocketMap.containsKey(userId) ，首先了为了代码强壮性考虑，假设代码以及机制没有问题，那么肯定这个逻辑是废的对吧。但是实际使用的时候发现偶尔会出现重连失败或者其他原因导致之前的session还存在，这里就做了一个清除旧session，迎接新session的功能。
+

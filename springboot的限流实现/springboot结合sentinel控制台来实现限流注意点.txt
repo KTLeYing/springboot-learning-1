@@ -1,0 +1,108 @@
+1、sentinel的启动步骤：
+（1）打开cmd（使用管理员身份）
+（2）执行  d:   进入D盘
+（3）执行 cd D:\Program Files (x86)\Sentinel\SentinelStart  进入sentinel-dashboard.jar的放置目录 （sentinel-dashboard.jar（3个版本 sentinel-dashboard-1.7.1.jar、sentinel-dashboard-1.7.2.jar、sentinel-dashboard-1.8.0.jar ）都在 D:\Program Files (x86)\Sentinel\SentinelStart 目录下，均可用）
+（4）接着输入 java -jar sentinel-dashboard-1.7.1.jar   然后按enter键，启动sentinel-dashboard-1.7.1.jar，这样是默认的设置，启动在8080端口。 【也可以加上一些自定义配置来启动，输入执行  java -Dserver.port=8080 -Dcsp.sentinel.dashboard.server=localhost:8080 -Dproject.name=sentinel-dashboard -jar sentinel-dashboard-1.7.1.jar 来执行，   比如说我的8080已被使用，所以修改一下为(端口号)：
+java -Dserver.port=8718 -Dcsp.sentinel.dashboard.server=localhost:8718 -Dproject.name=sentinel-dashboard -Dcsp.sentinel.api.port=8719 -jar sentinel-dashboard-1.7.1.jar
+
+解释:
+-Dserver.port=8718 控制台端口，sentinel控制台是一个spring boot程序。客户端配置文件需要填对应的配置，如：spring.cloud.sentinel.transport.dashboard=192.168.1.102:8718
+-Dcsp.sentinel.dashboard.server=localhost:8718 控制台的地址，指定控制台后客户端会自动向该地址发送心跳包。
+-Dproject.name=sentinel-dashboard  指定Sentinel控制台程序的名称
+-Dcsp.sentinel.api.port=8719 (默认8719，自己也可以设为其他的客户端端口号) 客户端提供给Dashboard访问或者查看Sentinel的运行访问的参数
+
+注1：csp.sentinel.dashboard.server这个配置是用在客户端，这里Sentinel控制台也使用是用于自己监控自己程序的api，否则无法显示控制台的api情况，当然这个也可以根据情况不显示。
+注2：csp.sentinel.api.port=8719是客户端的端口，需要把客户端设置的端口穿透防火墙，可在控制台的“机器列表”中查看到端口号，这里Sentinel控制台也使用是用于自己程序的api传输，由于是默认端口所以控制台也可以不设置（不设置默认是8719，自己也可以设置为其他的客户端端口号）。
+注3：客户端需向控制台提供端口，配置文件配置，如：spring.cloud.sentinel.transport.port=8720
+注4：从 Sentinel 1.6.0 起，Sentinel 控制台引入基本的登录功能，默认用户名和密码都是 sentinel
+
+springcloud中使用sentinel，添加如下配置:
+spring:
+  cloud:
+    sentinel:
+      transport:
+        port: 8720
+        dashboard: localhost:8718  
+】
+（5）接着c启动后md出现好多信息，最后会出现 “......2020-09-26 23:29:55.953  INFO 40392 --- [           main] o.s.j.e.a.AnnotationMBeanExporter        : Registering beans for JMX exposure on startup
+2020-09-26 23:29:56.009  INFO 40392 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2020-09-26 23:29:56.022  INFO 40392 --- [           main] c.a.c.s.dashboard.DashboardApplication   : Started DashboardApplication in 12.889 seconds (JVM running for 13.97)”,就像springboot项目启动成功一样的信息（因为这个jar是个标准的Springboot应用），则说明启动成功。
+（6）在浏览器上输入 http://localhost:8080/ （默认端口号为8080，如果是自己启动时自定义端口号配置了，则把8080改为自动设置的端口号） 来访问（可能加载较慢），然后输入用户和密码登录(默认用户名和密码都是 sentinel )，登录成功后可以看到Sentinel控制台界面。
+
+
+springboot项目结合sentinel控制台来实现测试步骤【具体参考ratelimiter-demo项目】：
+（1）新建和配置好springboot项目，依赖为：
+<properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <spring-cloud.version>Finchley.SR1</spring-cloud.version>
+    </properties>
+
+    <dependencies>
+        <!--sentinel-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+        </dependency>
+    </dependencies>
+
+  <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>0.2.2.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+（2）配置好.yml或.properties文件：
+【.properties】
+#端口号
+server.port=8080
+
+#application名称配置，在sentinel控制台显示的程序项目的名称
+spring.application.name=myserver
+
+#sentinel配置
+#sentinel控制台的客户端传输端口（不设置默认为8719，自己也可以设其他的传输端口号）
+spring.cloud.sentinel.transport.port=8719
+#访问sentinel平台页面的端口（如何自己项目设置了默认8080，这个端口不能在设为8080了，设置一个其他的端口号，否则被占用，访问不了sentinel控制台网址）
+spring.cloud.sentinel.transport.dashboard=localhost:8081
+#因为Sentinel采用延迟加载，只有在主动发起一次请求后，才会被拦截并发送给服务端。如果想关闭这个延迟，就在上面的yml里把eager的注释解放掉。
+#spring.cloud.sentinel.eager=true
+
+【.yml】
+#端口号
+server:
+   port: 8080
+
+#sentinel配置
+spring:
+ application: 
+   name: myserver   #application名称配置，在sentinel控制台显示的程序项目的名称
+ cloud:
+  sentinel:
+    transport:
+      port: 8719  #sentinel控制台的客户端传输端口（不设置默认为8719，自己也可以设其他的传输端口号）
+      dashboard: localhost:8081  #访问sentinel平台页面的端口（如何自己项目设置了默认8080，这个端口不能在设为8080了，设置一个其他的端口号，否则被占用，访问不了sentinel控制台网址）
+#因为Sentinel采用延迟加载，只有在主动发起一次请求后，才会被拦截并发送给服务端。如果想关闭这个延迟，就在上面的yml里把eager的注释解放掉。
+    #eager: true
+（3）写好一个controller测试类
+（4）打开cmd，接着输入cd 进去 D:\Program Files (x86)\Sentinel\SentinelStart  目录下，输入执行  java -Dserver.port=8081 -Dcsp.sentinel.dashboard.server=localhost:8081 -Dproject.name=sentinel-dashboard -jar sentinel-dashboard-1.7.1.jar 来执行，   这里的端口号一定要和springboot目录.yml配置文件中dashboard: localhost:8081 端口号保持一样，所以我这里的端口号为8081，这是因为我的项目已经占用了8080端口，sentinel控制台访问不能在使用了，所以修改一下为端口号（如果自己的程序项目没占用8080的，.yml就可以配置使用8080端口号，配置成dashboard: localhost:8080，我们的sentinel可以使用默认8080端口号，我们就接着直接输入 -jar sentinel-dashboard-1.7.1.jar   然后按enter键，启动sentinel-dashboard-1.7.1.jar，这样是默认的设置，启动在8080端口）
+（5）我们就可以在浏览器访问 http://localhost:8081 (端口号是对应自己设置的，参考 dashboard: localhost:8081)，登录就可以看到sentinel控制台首页了，开始没什么东西显示的，因为我们还没执行controller的后端接口。
+（6）然后我们再启动运行idea的springboot项目，我们然后在我们的后端测试工具里面来测试一下一个后端接口，然后再去刷新sentinel控制台页面，就可以看到我们刚刚执行测试的后端接口的相关信息了。
+（7）【注意！！!】一定先cmd启动 sentinel-dashboard-1.7.1.jar 后，再去运行启动springboot项目，否则cmd的sentinel-dashboard-1.7.1.jar会启动失败。
+
+
+

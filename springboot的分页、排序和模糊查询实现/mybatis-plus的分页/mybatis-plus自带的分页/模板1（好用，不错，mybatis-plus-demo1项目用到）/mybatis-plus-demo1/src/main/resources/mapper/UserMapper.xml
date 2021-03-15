@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.mybatisplusdemo1.mapper.UserMapper">
+
+    <select id="userList" resultType="com.example.mybatisplusdemo1.entity.User">
+        select * from user
+    </select>
+
+    <!--查询直接返回一个用户dto-->
+    <select id="findUserDTO" resultType="com.example.mybatisplusdemo1.dto.UserDTO">
+        select id, username as username1, password, sex, age as age1, phone as phone1 from user
+    </select>
+
+
+</mapper>

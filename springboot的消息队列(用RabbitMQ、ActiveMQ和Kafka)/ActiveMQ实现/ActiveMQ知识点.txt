@@ -1,0 +1,44 @@
+一、ActiveMQ的工作原理(与RabbitMQ的原理相似)
+1、比较
+Topic	                            Queue
+工作模式	订阅发布模式，如果当前没有订阅者，消息将会被丢弃。如果有多个订阅者，那么这些订阅者都会收到消息	负载均衡模式，如果当前没有消费者，消息也不会丢弃如果有多个消费者，那么-条消息也只会发送给其中-个消费者, 并且要求消费者ack信息
+有无状态	无状态	Queue数据默认会在mq服务器上以文件形式保存，比如Active MQ一般保存在${AMQ_ HOME}\data\kr -store\data下面。也可以配置成DB存储。
+传递完整性	如果没有订阅者，消息会被丢弃	消息不会丢弃
+处理效率	由于消息要按照订阅者的数量进行复制，所以处理性能会随着订阅者的增加而明显降低，并且还要结合不同消息协议自身的性能差异	由于条消息只发送给一个消费者， 所以就算消费者再多，性能也不会有明显降低。当然不同消息协议的具体性能也是有差异的
+
+2、在点对点的消息传递域中，目的地被称为队列(Queue)
+每个消息只能有一个消费者，类似1对1的关系。好比个人快递自己领取自己的。
+消息的生产者和消费者之间没有时间上的相关性。无论消费者在生产者发送消息的时候是否处于运行状态，消费者都可以提取消息。好比我们的发送短信，发送者发送后不见得接收者会即收即看。
+消息被消费后队列中不会再存储，所以消费者不会消费到已经被消费掉的消息。
+
+3、在发布订阅消息传递域中，目的地被称为主题(topic)
+生产者将消息发布到topic中， 每个消息可以有多个消费者，属于1: N的关系
+生产者和消费者之间有时间上的相关性。订阅某一个主题的消费者只能消费自它订阅之后发布的消息。
+生产者生产时，topic不保存消息它是无状态的不落地，假如无人订阅就去生产，那就是一条废消息，所以，一般先启动消费者再启动生产者。
+JMS规范允许客户创建持久订阅，这在一定程度上放松了时间上的相关性要求。持久订阅允许消费者消费它在未处于激活状态时发送的消息。好比微信公众号订阅
+（参考教程：https://blog.csdn.net/hgx_suiyuesusu/article/details/102489714?utm_medium=distribute.pc_relevant.none-task-blog-title-11&spm=1001.2101.3001.4242）
+
+二、ActiveMq 的特性　
+多种语言和协议编写客户端。语言: Java, C, C++, C#, Ruby, Perl, Python, PHP。应用协议: OpenWire,Stomp REST,WS Notification,XMPP,AMQP
+完全支持JMS1.1和J2EE 1.4规范 (持久化,XA消息,事务)
+对Spring的支持,ActiveMQ可以很容易内嵌到使用Spring的系统里面去,而且也支持Spring2.0的特性
+通过了常见J2EE服务器(如 Geronimo,JBoss 4, GlassFish,WebLogic)的测试,其中通过JCA 1.5 resource adaptors的配置,可以让ActiveMQ可以自动的部署到任何兼容J2EE 1.4 商业服务器上
+支持多种传送协议:in-VM,TCP,SSL,NIO,UDP,JGroups,JXTA
+支持通过JDBC和journal提供高速的消息持久化
+从设计上保证了高性能的集群,客户端-服务器,点对点
+支持Ajax
+支持与Axis的整合
+可以很容易得调用内嵌JMS provider,进行测试
+（参考教程：https://blog.csdn.net/u012816777/article/details/73333327?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-10.control&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-10.control）
+
+
+三、 什么情况下使用ActiveMQ?
+多个项目之间集成 
+(1) 跨平台 
+(2) 多语言 
+(3) 多项目
+降低系统间模块的耦合度，解耦 
+(1) 软件扩展性
+系统前后端隔离 
+(1) 前后端隔离，屏蔽高安全区
+（参考教程：https://blog.csdn.net/u012816777/article/details/73333327?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-10.control&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-10.control）

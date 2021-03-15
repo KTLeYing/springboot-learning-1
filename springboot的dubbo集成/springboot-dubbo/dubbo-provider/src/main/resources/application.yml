@@ -1,0 +1,48 @@
+server:
+  port: 8081
+
+# mysql
+spring:
+    profiles:
+        active: dev
+    datasource:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.jdbc.Driver
+    jackson:
+        time-zone: GMT+8
+        date-format: yyyy-MM-dd HH:mm:ss
+
+
+# Mybatis
+mybatis:
+    mapperLocations: classpath:mapper/**/*.xml
+    configLocation: classpath:mybatis.xml
+
+#pagehelper
+pagehelper:
+  helper-dialect: mysql
+  offset-as-page-num: true
+  params: count=countSql
+  reasonable: true
+  row-bounds-with-count: true
+  support-methods-arguments: true
+
+# dubbo
+dubbo:
+  scan:
+    basePackages: com.example.demo.dubbo.impl
+  application:
+    id: dubbo-provider
+    name: dubbo-provider
+  protocol:
+    id: dubbo
+    name: dubbo
+    port: -1
+  registry:
+    id: my-registry
+    address: zookeeper://127.0.0.1:2181
+    timeout: 20000
+  provider:
+    timeout: 20000
+  consumer:
+    check: false

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mzl.shirojwt.dao.PermissionDao">
+
+    <!--根据用户角色查询权限-->
+    <select id="findPermissionByRole" resultType="com.mzl.shirojwt.entity.Permission">
+        select p.* from role r, role_permission rp, permission p where r.id = rp.role_id and p.id = rp.permission_id and r.name = #{name}
+    </select>
+
+</mapper>

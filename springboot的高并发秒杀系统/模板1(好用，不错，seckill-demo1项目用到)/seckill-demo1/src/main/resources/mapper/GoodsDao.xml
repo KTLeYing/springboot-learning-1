@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mzl.seckilldemo1.dao.GoodsDao">
+
+    <!--通过版本信息减少库存,stock_count > 0 和 版本号实现乐观锁 防止超卖-->
+    <update id="reduceStockByVersion">
+        update sk_goods_seckill
+        set stock_count = stock_count - 1, version = version + 1
+        where goods_id = #{goodsId} and stock_count > 0 and version = #{version}
+    </update>
+
+    <!--查询所有的商品-->
+    <select id="listGoods" resultType="com.mzl.seckilldemo1.dto.GoodsDTO">
+        select g.*, gs.seckill_price, gs.stock_count, gs.start_date, gs.end_date, gs.version
+        from sk_goods g left join sk_goods_seckill gs on g.id = gs.goods_id
+    </select>
+
+    <!--查询商品详情-->
+    <select id="detail" resultType="com.mzl.seckilldemo1.dto.GoodsDTO">
+        select g.*, gs.seckill_price, gs.stock_count, gs.start_date, gs.end_date, gs.version
+        from sk_goods g left join sk_goods_seckill gs on g.id = gs.goods_id where gs.goods_id = #{goodsId}
+    </select>
+
+    <!--通过商品id获取商品版本信息-->
+    <select id="getVersionByGoodsId" resultType="java.lang.Integer">
+        select version from sk_goods_seckill
+        where goods_id = #{goodsId}
+    </select>
+
+
+</mapper>

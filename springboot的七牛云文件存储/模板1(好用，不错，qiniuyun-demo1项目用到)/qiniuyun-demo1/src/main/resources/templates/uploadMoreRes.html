@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>上传多个文件结果</title>
+</head>
+<body>
+<h1 style="color: greenyellow">上传多个图片结果：</h1>
+<p>Code:<span style="color: orange" th:text="${code}"></span></p>
+<p>Msg:<span style="color: orange" th:text="${msg}"></span></p>
+<p>图片显示:</p>
+<table>
+    <tbody>
+    <tr style="color: orange" th:each="str : ${data}">
+    <td><img th:src="@{${str}}" width="200" height="200"/></td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

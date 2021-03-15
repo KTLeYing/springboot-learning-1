@@ -1,0 +1,130 @@
+一、Springboot实现https的步骤：
+（1）通过jdk生成证书，打开命令行cmd，输入
+ keytool -genkeypair -alias myssl -keyalg RSA -keystore D:\myssl.key (D:\myssl.key   为库存储目录，自己可以修改, 我自己的用这个目录就行了，有效期为90天，文件名和别名尽量保持相同，方便处理)
+或
+ keytool -genkeypair -alias myssl -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore D:\myssl.key -validity 3650（有效期为3650天，好用，不错，文件名和别名尽量保持相同，方便处理）
+【按回车后然后出现，按照项下面来配置】
+输入密钥库口令: 105293
+再次输入新口令: 105293
+您的名字与姓氏是什么?
+  [Unknown]:  mzl
+您的组织单位名称是什么?
+  [Unknown]:  mzl
+您的组织名称是什么?
+  [Unknown]:  mzl
+您所在的城市或区域名称是什么?
+  [Unknown]:  ZJ
+您所在的省/市/自治区名称是什么?
+  [Unknown]:  GD
+该单位的双字母国家/地区代码是什么?
+  [Unknown]:  CN
+CN=mzl, OU=mzl, O=mzl, L=ZJ, ST=GD, C=CN是否正确?
+  [否]:  y
+
+正在为以下对象生成 2,048 位RSA密钥对和自签名证书 (SHA256withRSA) (有效期为 3,650 天):
+         CN=mzl, OU=mzl, O=mzl, L=ZJ, ST=GD, C=CN
+
+然后就会生成了一个myssl.key文件（在D盘下），然后把这个文件剪切移动到D:\Program Files (x86)\SSL目录下统一管理。
+
+【PS1】
+JKS 密钥库使用专用格式。建议使用 "keytool -importkeystore -srckeystore C:\Users\Administrator\.keystore -destkeystore C:\Users\Administrator\.keystore -deststoretype pkcs12" 迁移到行业标准格式 PKCS12。
+【PS2】
+如果已经有一个证书，可以将该证书转换为 PKCS格式:
+keytool -import -alias myssl -file hellowood.crt -keystore hellowood.p12
+// 或
+keytool -importkeystore -srckeystore hellowood.jks -destkeystore hellowood.p12 -deststoretype pkcs12
+
+（2）添加插件依赖，不然有时候不能加载SSL文件，启动失败（因为HTTPS链接的建立过程中涉bai及到服务器端证书、客户端证书（可选）、服务器端的非对称秘钥以及后续通信过程中使用的对称秘钥等，springboot默认下不会自动加载它，过滤了它）
+【###注意：如果下次不行加载失败的话，则交替进行使用依赖，比如说上一次引入了，这一次就注释掉，不需要了；如果上一次注释掉没引入使用到，则这一次解开注释去引入使用依赖###】
+<build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <!-- 资源加载插件依赖 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
+            </plugin>
+        </plugins>
+
+       <!-- 资源配置依赖 -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>*.key</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>*.key</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+
+（3）配置SSL，将生成的证书复制到项目的resources下。并在application.yml文件中配置(http中的默认端口是80，而https中的默认端口是443）。这里需要注意如果配置443端口被占用，有可能是装了虚拟机vMware占了443端口。可以先去关闭该端口或者修改默认的https端口。
+【然后在application.yml（application.properties）添加一下配置】
+####ssl协议配置（https）####
+#https加密端口号 443（默认端口号），可以自己修改
+server.port=8443
+#SSL证书路径 一定要加上classpath:
+server.ssl.key-store=classpath:myssl.key
+#SSL证书密码
+server.ssl.key-store-password=105293 (要和刚刚在cmd输入的一样)
+#证书类型
+server.ssl.key-store-type=JKS
+#或
+#server.ssl.key-store-type=PKCS12
+#证书别名(自己定义)
+server.ssl.key-alias=myssl   (这里要和输入命令的别名一致，设置是别名尽量和文件名一样)
+#使工作
+server.ssl.enabled=true
+
+（4）在启动类中添加以下代码：
+   /**
+     * http重定向到https
+     * @return
+     */
+    @Bean
+    public TomcatServletWebServerFactory servletContainer() {
+        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory() {
+            @Override
+            protected void postProcessContext(Context context) {
+                SecurityConstraint constraint = new SecurityConstraint();
+                constraint.setUserConstraint("CONFIDENTIAL");
+                SecurityCollection collection = new SecurityCollection();
+                collection.addPattern("/*");  //监听所有路径
+                constraint.addCollection(collection);
+                context.addConstraint(constraint);
+            }
+        };
+        tomcat.addAdditionalTomcatConnectors(httpConnector());
+        return tomcat;
+    }
+
+    /**
+     * http连接器，http中的默认端口是80，而https中的默认端口是443,这里需要注意如果配置443端口被占用，有可能是装了虚拟机vMware占了443端口。
+     * 可以先去关闭该端口或者修改默认的https端口
+     * @return
+     */
+    @Bean
+    public Connector httpConnector() {
+        Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
+        connector.setScheme("http");
+        //Connector监听的http的端口号
+        connector.setPort(8080);
+        connector.setSecure(false);
+        //监听到http的端口号后转向到的https的端口号
+//        connector.setRedirectPort(443);
+        connector.setRedirectPort(8443);
+        return connector;
+    }
+  

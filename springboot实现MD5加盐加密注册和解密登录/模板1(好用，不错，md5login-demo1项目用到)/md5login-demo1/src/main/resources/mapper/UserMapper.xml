@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mzl.md5logindemo1.dao.UserDao">
+
+    <resultMap id="BaseResultMap" type="com.mzl.md5logindemo1.entity.User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="name" column="name"/>
+    </resultMap>
+
+    <!--添加用户到数据库-->
+    <insert id="register">
+        insert into user(username, password, name, available)
+        values(#{username}, #{password}, #{name}, 0)
+    </insert>
+
+    <!--用户激活-->
+    <update id="active">
+        update user
+        set available = 1
+        where username = #{username}
+    </update>
+
+    <!--从数据库中查询用户-->
+    <select id="findUser" resultMap="BaseResultMap">
+        select * from user
+        where username = #{username} and password = #{pd}
+    </select>
+
+    <!--查询用户名是否已经存在-->
+    <select id="existUser" resultType="string">
+       select username from user where username = #{username}
+    </select>
+
+</mapper>

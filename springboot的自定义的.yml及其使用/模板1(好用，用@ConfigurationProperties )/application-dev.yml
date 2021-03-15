@@ -1,0 +1,6 @@
+#配置Csrf的白名单域名
+csrf:
+  releaseDomainList:
+    - localhost:8080
+    - localhost:8181
+

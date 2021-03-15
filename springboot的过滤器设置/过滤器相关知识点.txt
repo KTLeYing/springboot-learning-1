@@ -1,0 +1,8 @@
+一、步骤
+  1、通过实现Filter接口，创建一个过滤器类
+  2、通过@WebFilter注解，注册过滤器。urlPatterns属性代表需要被过滤的请求地址。filterName属性代表过滤器名称。
+  3、在SpringBoot应用启动类中，添加@ServletComponentScan注解，表示项目启动自动扫描Servlet组件。Filter属于Servlet组件。【但是，如果使用了filter配置类就不用在启动类添加该servlet组件扫描注解@ServletComponentScan了，也不用在过滤器类添加@WebFilter注解了】
+
+
+参考教程：
+https://blog.csdn.net/yb546822612/article/details/102950981?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2.control&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2.control   或   https://blog.csdn.net/qq_30401609/article/details/82760145?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.control&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.control   或    https://blog.csdn.net/m0_38075425/article/details/81164930

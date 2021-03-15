@@ -1,0 +1,38 @@
+在html页面添加：
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+就可以使用thymeleaf的相关属性了。
+例如：
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>导入导出表格</title>
+</head>
+<body>
+  ........
+  ........
+</body>
+</html>
+
+（关于thymeleaf相关属性知识点的使用参考教程：http://www.voycn.com/article/shishangzuixiang-thymeleaf-shiyongjiaocheng    或    https://blog.csdn.net/qq_38361800/article/details/110862242  或   https://www.cnblogs.com/chenlove/p/9375756.html ）
+
+一、thymeleaf之前台界面获取后台属性值
+方法1：[[...]]的方式
+<th style="text-align: center">[[${order.id}]]</th>
+方法2：标签取值的方式
+<tr th:each="user : ${userList}" th:class="${userStat.odd}? 'odd'">
+      <td th:text="${user.name}">Onions</td>
+     <td th:text="${user.age}">2.41</td>
+</tr>
+
+
+
+
+
+
+
+
+
+
+
+

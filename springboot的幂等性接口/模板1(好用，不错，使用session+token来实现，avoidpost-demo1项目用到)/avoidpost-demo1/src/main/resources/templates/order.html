@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>订单-详情</title>
+</head>
+<body>
+   <form action="/order/submit">
+       <input type="hidden" id="token" name="token" th:value='${session.token}' />
+       <input type="submit" value="提交"/>
+   </form>
+</body>
+</html>

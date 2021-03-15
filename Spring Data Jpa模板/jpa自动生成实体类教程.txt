@@ -1,0 +1,12 @@
+自动生成实体类步骤：
+（1）在idea右侧，点击“Database”，连接目标数据库；
+（2）点击idea左侧的“Persistent”，然后弹出一个蓝色的数据库图标，右击这个蓝色的数据库图标，选择“Assign Data Sources...”,然后子Data Source 那个格下面添加刚刚连接好的数据库；
+（3）然后右键点击刚刚那个蓝色的数据库图标，选择“Generate Persistent Mapping”,在选择点击“By Database Schema”，然后会弹出自动生成并导入实体类的配置框；
+（4）“Choose Data Sourse”那里选择刚才连接好的数据库(必填)；“Package”那里现在entity具体的路径(必填)；“Entity prefix”那里写自己要配置实体类名的前缀；“Entity suffix”那里写自己要配置实体类名的后缀；下面的数据库表那里在自己需要生成的数据库表前的方框打上钩，后面的Map as可以修改成自己需要的数据库名；最下面的全保持默认，也就是只有Generate JPA Annotations(Java5)、Generate SeparateX...和Generate Column Pro...这三个方框前打钩，其他的方框不用，而且中间的那两个长方形框框也不用选择任何东西，保持默认即可（具体参考同级目录里的那张图片—jpa自动生成实体类图片教程）；
+（5）然后点击OK即可自动成功生成实体类。
+
+参考教程：
+https://blog.csdn.net/mononoke111/article/details/91924002   或
+https://blog.csdn.net/toocruel/article/details/80236912    或
+https://blog.csdn.net/YoungLee16/article/details/83106533    或
+https://blog.csdn.net/u012279452/article/details/78400168?utm_medium=distribute.pc_relevant_t0.none-task-blog-BlogCommendFromMachineLearnPai2-1.nonecase&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-BlogCommendFromMachineLearnPai2-1.nonecase

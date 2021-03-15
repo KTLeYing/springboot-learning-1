@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>模拟网上银行转账页面</title>
+</head>
+<body>
+   <form action="/transferMoney" method="post">
+       <input type="hidden" th:value="${_csrf.token}" th:name="${_csrf.parameterName}">
+       <div>
+           <label>姓名：</label>
+           <input type="text" name="name">
+       </div>
+       <div>
+           <label>金额：</label>
+           <input type="text" name="money">
+       </div>
+       <input type="submit" value="转账">
+   </form>
+</body>
+</html>

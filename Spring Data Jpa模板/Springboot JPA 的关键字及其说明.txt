@@ -1,0 +1,89 @@
+【参考1】
+关键字	                            方法命名         	                      sql where字句
+And	                     findByNameAndPwd	                    where name= ? and pwd =?
+Or	                    findByNameOrSex	                   where name= ? or sex=?
+Is,Equals	                    findById,findByIdEquals	                   where id= ?
+Between                       findByIdBetween         	                    where id between ? and ?
+LessThan           	    findByIdLessThan	                                    where id < ?
+LessThanEquals	    findByIdLessThanEquals	                    where id <= ?
+GreaterThan	    findByIdGreaterThan                     	    where id > ?
+GreaterThanEquals      findByIdGreaterThanEquals                     where id > = ?
+After	                    findByIdAfter	                                    where id > ?
+Before          	   findByIdBefore                            	    where id < ?
+IsNull                 	   findByNameIsNull                        	     where name is null
+isNotNull,NotNull	   findByNameNotNull	                     where name is not null
+Like                    	   findByNameLike                                	     where name like ?
+NotLike            	   findByNameNotLike 	                      where name not like ?
+StartingWith	   findByNameStartingWith                   	     where name like ‘?%’
+EndingWith	   findByNameEndingWith	                      where name like ‘%?’
+Containing	   findByNameContaining	                     where name like ‘%?%’
+OrderBy            	   findByIdOrderByXDesc                  	      where id=? order by x desc
+Not                    	  findByNameNot                            	     where name <> ?
+In                                findByIdIn(Collection<?> c)             	      where id in (?)
+NotIn                 	   findByIdNotIn(Collection<?> c)	      where id not in (?)
+True            	   findByAaaTue                                  	      where aaa = true
+False                     	   findByAaaFalse                                            where aaa = false
+IgnoreCase	   findByNameIgnoreCase	                        where UPPER(name)=UPPER(?)
+Count	                    countByFirstName   	                        select count(*) from ... where x.firstName = ?1
+Exists	                  existsByFirstName	                                 like the dao.exists(Example),judge by attribution of                                                                                                          firstName:select keyindex0_.id as col_0_0_ from                                                                                                            key_index keyindex0_ where keyindex0_.name=? limit ?
+
+【参考2】
+关键字                        方法样例	                                       JPQL 字句
+And               findByLastnameAndFirstname     … where x.lastname = ?1 and x.firstname = ?2
+Or                 findByLastnameOrFirstname        … where x.lastname = ?1 or x.firstname = ?2
+Is,Equals        findByFirstname,findByFirstnameIs,findByFirstnameEquals        … where x.firstname = ?1
+Between        findByStartDateBetween             … where x.startDate between ?1 and ?2
+LessThan       findByAgeLessThan                    … where x.age < ?1
+LessThanEqual    findByAgeLessThanEqual      … where x.age <= ?1
+GreaterThan       findByAgeGreaterThan          … where x.age > ?1
+GreaterThanEqual      findByAgeGreaterThanEqual       … where x.age >= ?1
+After                    findByStartDateAfter                 … where x.startDate > ?1
+Before                 findByStartDateBefore                 … where x.startDate < ?1
+IsNull                   findByAgeIsNull                           … where x.age is null
+IsNotNull,NotNull       findByAge(Is)NotNull           … where x.age not null
+Like                      findByFirstnameLike                    … where x.firstname like ?1
+NotLike                findByFirstnameNotLike              … where x.firstname not like ?1
+StartingWith          findByFirstnameStartingWith      … where x.firstname like ?1(parameter bound with appended %)
+EndingWith             findByFirstnameEndingWith      … where x.firstname like ?1(parameter bound with prepended %)
+Containing             findByFirstnameContaining          … where x.firstname like ?1(parameter bound wrapped in %)
+OrderBy            findByAgeOrderByLastnameDesc           … where x.age = ?1 order by x.lastname desc
+Not                      findByLastnameNot                          … where x.lastname <> ?1
+In                  findByAgeIn(Collection<Age> ages)           … where x.age in ?1
+NotIn              findByAgeNotIn(Collection<Age> age)          … where x.age not in ?1
+True                   findByActiveTrue()                                   … where x.active = true
+False               findByActiveFalse()                                … where x.active = false
+IgnoreCase             findByFirstnameIgnoreCase             … where UPPER(x.firstame) = UPPER(?1)
+Count	                    countByFirstName   	                        select count(*) from ... where x.firstName = ?1
+Exists	                  existsByFirstName	                                 like the dao.exists(Example),judge by attribution of                                                                                                          firstName:select keyindex0_.id as col_0_0_ from                                                                                                            key_index keyindex0_ where keyindex0_.name=? limit ?
+
+【参考3】
+全局修饰： Distinct， Top， First
+关键词： IsNull， IsNotNull， Like， NotLike， Containing， In， NotIn，IgnoreCase， Between， Equals， LessThan， GreaterThan， After， Before…
+排序方向： Asc， Desc
+连接词： And， Or
+
+And — 等价于 SQL 中的 and 关键字，比如 findByUsernameAndPassword(String user, Striang pwd)；
+Or — 等价于 SQL 中的 or 关键字，比如 findByUsernameOrAddress(String user, String addr)；
+Between — 等价于 SQL 中的 between 关键字，比如 findBySalaryBetween(int max, int min)；
+LessThan — 等价于 SQL 中的 “<”，比如 findBySalaryLessThan(int max)；
+GreaterThan — 等价于 SQL 中的”>”，比如 findBySalaryGreaterThan(int min)；
+IsNull — 等价于 SQL 中的 “is null”，比如 findByUsernameIsNull()；
+IsNotNull — 等价于 SQL 中的 “is not null”，比如 findByUsernameIsNotNull()；
+NotNull — 与 IsNotNull 等价；
+Like — 等价于 SQL 中的 “like”，比如 findByUsernameLike(String user)；
+NotLike — 等价于 SQL 中的 “not like”，比如 findByUsernameNotLike(String user)；
+OrderBy — 等价于 SQL 中的 “order by”，比如 findByUsernameOrderBySalaryAsc(String user)；
+Not — 等价于 SQL 中的 “！ =”，比如 findByUsernameNot(String user)；
+In — 等价于 SQL 中的 “in”，比如 findByUsernameIn(Collection userList) ，方法的参数可以是 Collection 类型，也可以是数组或者不定长参数；
+NotIn — 等价于 SQL 中的 “not in”，比如 findByUsernameNotIn(Collection userList) ，方法的参数可以是 Collection 类型，也可以是数组或者不定长参数；
+
+嵌套实体:
+主实体中子实体的名称+ _ +子实体的属性名称
+List findByAddress_ZipCode(ZipCode zipCode)
+表示查询所有 Address（地址）的zipCode（邮编）为指定值的所有Person(人员)
+
+
+
+
+
+

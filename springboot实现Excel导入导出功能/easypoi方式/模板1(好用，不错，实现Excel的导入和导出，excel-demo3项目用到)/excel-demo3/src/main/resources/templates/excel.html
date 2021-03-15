@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>导入导出表格</title>
+    <script src="https://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
+    <script type="text/javascript">
+        function exp() {
+            console.info("ddd");
+            $.ajax({
+                url: "/exportExcel",
+                type: "post",
+                async: true,
+                data:{},
+                dataType: "json",
+                success: function (result) {
+                    if (result=="导出成功"){
+                        alert("恭喜您导出成功！");
+                    }else {
+                        alert("很遗憾导出失败！");
+                    }
+                }
+            });
+        }
+    </script>
+
+</head>
+<body>
+<div>
+    <a href="/exportExcel"><button type="button">导出</button></a>
+<!--    <button type="button" onclick="exp()">导出</button>-->
+    <br>
+    <form id="form_table" action="/importExcel" enctype="multipart/form-data" method="post">
+        <input type="file" name="file"/>
+        <button type="submit" >导入</button>
+    </form>
+</div>
+<div>
+    <table border="1">
+        <tr>
+            <th>编号</th>
+            <th>用户id</th>
+            <th>用户名</th>
+            <th>密码</th>
+            <th>状态</th>
+        </tr>
+        <tr th:each="user,infoStat : ${userList}" >
+            <td th:text="${infoStat.index}"></td>
+            <td th:text="${user.id}"></td>
+            <td th:text="${user.username}"></td>
+            <td th:text="${user.password}"></td>
+            <td th:text="${user.status}"></td>
+        </tr>
+    </table>
+</div>
+
+
+</body>
+</html>

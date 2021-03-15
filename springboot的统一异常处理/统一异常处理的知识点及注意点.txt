@@ -1,0 +1,6 @@
+  自定义统一异常处理类中会用到如下一些关键的注解，概述如下：
+@ControllerAdvice：捕获 Controller 层抛出的异常，如果添加 @ResponseBody 返回信息则为JSON格式。
+@RestControllerAdvice：相当于 @ControllerAdvice 与 @ResponseBody 的结合体。
+@ExceptionHandler：统一捕获处理一种类的异常，减少代码重复率，降低复杂度。
+
+创建一个 GlobalExceptionHandler 类，并添加上 @RestControllerAdvice 注解就可以定义出异常通知类了，然后在定义的方法中添加上 @ExceptionHandler 即可实现异常的捕捉。

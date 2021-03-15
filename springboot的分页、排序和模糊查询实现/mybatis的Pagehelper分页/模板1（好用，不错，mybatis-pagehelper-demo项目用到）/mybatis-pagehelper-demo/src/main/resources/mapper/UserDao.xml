@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mzl.mybatispagehelperdemo.dao.UserDao">
+
+    <!--分页查询用户-->
+    <select id="findUserByPage" resultType="com.mzl.mybatispagehelperdemo.entity.User">
+        select * from user
+    </select>
+
+    <!--分页查询用户（有查询条件）-->
+    <select id="findUserByPage1" resultType="com.mzl.mybatispagehelperdemo.entity.User">
+        select * from user where username like '%${username}%' and age > #{age}
+    </select>
+
+</mapper>

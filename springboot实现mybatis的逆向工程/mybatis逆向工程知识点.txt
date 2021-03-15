@@ -1,0 +1,24 @@
+参考教程（可以用）：
+https://mp.weixin.qq.com/s?__biz=MzIxMjU5NjEwMA==&mid=2247498262&idx=1&sn=c65f989d531d39bdccc49f303c6ab22f&chksm=97411efda03697ebaeb5227d4fa4eb20445ed42899840881d85cf742f282152ae9f66e1884cb&mpshare=1&scene=1&srcid=12128rezuZXHS1mSTeJb4bVh&sharer_sharetime=1608011780915&sharer_shareid=f34cf208deb08d1b6c9b70c7fab0fbe9&key=f2b71f60f90dc728e6252c9cfbde148dbda940651f32911ed38a7145ad6fdd5385a486f9e3f21014149738c5c8fdf54339f7eda4eacff19789728c013e96c64814f0d388b662993cdb099e81e1699c1f7bd0f87b86b2ce8d51e93d2f791855a1b37e9f1b3f99a8ea5cb372ea3c1d222ef0740b81997125417d4ac6bf1248b21c&ascene=1&uin=MzExNDE3MjQ2Mw%3D%3D&devicetype=Windows+10+x64&version=6300002f&lang=zh_CN&exportkey=Axr3y148dIm%2FrmNhobv%2Bw5U%3D&pass_ticket=gkc9y%2Fpl7L%2BNJEPBOnYQtX4HV9WjBX9mloesic2%2FyGaoPupQAC4e7ONftnTW2%2BIA&wx_header=0  
+或    
+https://github.com/brianway/springmvc-mybatis-learning/blob/master/mybatis/mybatis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(18)-mybatis%E9%80%86%E5%90%91%E5%B7%A5%E7%A8%8B.md
+
+
+逆向工程的步骤：
+（1）新建一个springboot项目；
+（2）在项目的根目录下新建一个GeneratorMapper.xml的自动生成代码的配置文件(具体的文件配置内容请参考同目录的 GeneratorMapper.xml 文件，此文件是通用的)；
+（3）在pom.xml 文件中添加mybatis反向工程插件依赖（先不要添加和配置mybatis依赖先）
+<plugin>
+	<groupId>org.mybatis.generator</groupId>
+	<artifactId>mybatis-generator-maven-plugin</artifactId>
+	<version>1.3.6</version>
+	<configuration>
+		<configurationFile>GeneratorMapper.xml</configurationFile>
+		<verbose>true</verbose>
+		<overwrite>true</overwrite>
+	</configuration>
+</plugin>
+（4）启动项目，然后点击右侧的Maven，点击Plugins，然后点击mybatis-generator，然后再双击mybatis-generator:generate ，就会自动生成相应的entity实体类、mapper接口和.xml的数据库具体操作了；
+（5）在第一次生成.xml的文件中，http://mybatis.org/dtd/mybatis-3-mapper.dtd显示红色，然后我们在红色的地方按Alt+Enter，选择...fetch，就会自动解决了；
+（6）就可以开始使用，编写各种业务逻辑了（开始添加和配置mybatis依赖）。
+

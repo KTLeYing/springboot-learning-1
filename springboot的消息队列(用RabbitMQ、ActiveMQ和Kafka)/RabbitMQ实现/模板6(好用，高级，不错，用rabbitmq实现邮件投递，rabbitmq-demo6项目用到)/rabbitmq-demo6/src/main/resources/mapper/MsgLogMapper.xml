@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mzl.rabbitmqdemo6.dao.MsgLogDao" >
+
+    <resultMap id="BaseResultMap" type="com.mzl.rabbitmqdemo6.pojo.MsgLog">
+        <id property="msgId" column="msg_id"/>
+        <result property="msg" column="msg"/>
+        <result property="exchange" column="exchange"/>
+        <result property="routingKey" column="routing_key"/>
+        <result property="status" column="status"/>
+        <result property="tryCount" column="try_count"/>
+        <result property="nextTryTime" column="next_try_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        msg_id, msg, exchange, routing_key, status, try_count, next_try_time, create_time, update_time
+    </sql>
+
+    <!--消息入库-->
+    <insert id="insert">
+        insert into msg_log
+        values(#{msgId}, #{msg}, #{exchange}, #{routingKey}, #{status}, #{tryCount}, #{nextTryTime}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!--更新消息日志-->
+    <update id="updateStatus">
+       update msg_log
+       set status = #{status}
+       where msg_id = #{msgId}
+    </update>
+
+    <!--更新投递数，投递次数+1-->
+    <update id="updateTryCount">
+        update msg_log
+        set try_count = try_count + 1, next_try_time = #{nextTryTime}, update_time = now()
+        where msg_id = #{msgId}
+    </update>
+
+    <!--查询消息日志-->
+    <select id="selectByMsgId" resultMap="BaseResultMap">
+       select * from msg_log
+       where msg_id = #{msgId}
+    </select>
+
+    <!--查询消息的超时时间-->
+    <select id="selectTimeoutMsg" resultMap="BaseResultMap">
+       select * from msg_log
+       where status = 0 and next_try_time &lt;= now()
+    </select>
+
+
+</mapper>

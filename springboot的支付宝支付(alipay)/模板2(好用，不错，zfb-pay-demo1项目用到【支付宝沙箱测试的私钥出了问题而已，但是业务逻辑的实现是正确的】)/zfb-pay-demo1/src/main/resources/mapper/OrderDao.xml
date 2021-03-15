@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mzl.zfbpaydemo1.dao.OrderDao">
+
+    <!--添加订单，保存到数据库-->
+    <insert id="addOrder">
+        insert into order_info(username, commodity, description, out_trade_no, money)
+        values(#{username}, #{commodity}, #{description}, #{outTradeNo}, #{money})
+    </insert>
+
+    <!--保存到数据库(更新订单信息)-->
+    <update id="updateOrder">
+        update order_info set trade_no = #{tradeNo}, status = #{status} where out_trade_no = #{outTradeNo}
+    </update>
+
+</mapper>

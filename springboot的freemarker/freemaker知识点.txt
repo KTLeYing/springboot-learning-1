@@ -1,0 +1,180 @@
+1、freemaker常用语法
+(1) ${var}
+适用类型：java中常用的八大基本类型以及我们的String引用类型，但是，freemarker中boolean类型显示时true==yes false==no
+示例：
+		在后台文件中定义变量
+		String strVar = "世界你好";
+		int intVar = 10;
+		boolean booVar = true;
+		在页面中获取变量：
+                               String获取：<font color="red"> ${strVar} </font>
+                               int获取：<font color="red"> ${intVar} </font>
+                               boolean获取：<font color="red"> ${booVar?string("yes","no")} </font>
+			展示结果：
+						String获取：世界你好
+						int获取：10
+						boolean获取：yes
+
+(2)${var!}
+适用类型：对 null 或者不存在的对象进行取值，可以设置默认值，例：
+${var!'我是默认值'} 即，有值时显示正常值，无值时显示默认值
+            示例：
+            在后台文件中定义变量
+            String strVar = "世界你好";
+            String str = null;
+            在页面中获取变量：
+            String获取：<font color="red"> ${strVar!"我是空"}</font><br>
+            str获取：<font color="red"> ${str!} </font><br>
+            str获取：<font color="red"> ${str!"默认"} </font><br>
+            展示结果：
+					String获取：世界你好
+					str获取：
+					str获取：默认
+
+(3)${封装对象.属性}
+适用类型：对封装对象进行取值，例：${User.name}
+    示例：
+           在后台文件中封装对象User[ name, age ]
+           String name = "姓名";
+           int age = 18;
+           在页面中获取变量：
+           name获取：<font color="red"> ${User.name}</font><br>
+           age获取：<font color="red"> ${User.age} </font><br>
+           展示结果：
+					name获取：姓名
+					age获取：18
+(4)${date?String(‘yyyy­MM­dd’)}
+适用类型：对日期格式进行取值，在这里我要强调的是，定义Date类型
+的变量时，java.util.Date无法输出日期，须使用java.sql.Date
+   示例：
+   在后台文件中定义变量
+			java.sql.Date date = new Date().getTime();
+			java.sql.Date time = new Date().getTime();
+			java.sql.Date datetime = new Date().getTime();
+	在页面中获取变量：
+    	date获取：<font color="red"> ${date?string('yyyyMM­dd')}</font><br>
+    	time获取：<font color="red"> ${date?string('HH:mm:ss')} </font><br>
+    	datetime获取：<font color="red"> ${date?string('yyyy­MM­dd HH:mm:ss')} </font><br>
+    	   展示结果：
+					name获取：姓名
+					age获取：18
+
+(5)${var?html}
+适用类型：转义HTML内容
+    示例：
+           在后台文件中封装变量Menu[ name, model ]
+           Menu m = new Menu();
+		        m.setName(" freemarker ");
+		        m.setModel("<font color = 'red'>我只是个菜单</font>");
+		        在页面中获取变量：
+		        非转义获取：<font color="red"> ${m.model}</font><br>
+		        转义获取： ${m.model?html} </font><br>
+	展示结果：
+				非转义获取：我只是个菜单
+				转义获取：<font color = 'red'>我只是个菜单</font>
+	
+(6)<#assign num = 100 />
+适用类型：定义变量，支持计算和赋值
+    示例：
+         在页面中定义变量：
+                 <#assign num = 100 />
+                 num获取：<font color="red"> ${num)} </font><br>
+                 计算结果：<font color="red"> ${num * 10}</font><br>
+                  展示结果：
+		                  num获取：100
+		                计算结果：1000
+         
+(7)对List集合进行取值
+	<#list list集合 as item>
+		${item} ­­取值
+	</#list>
+	示例：
+	在后台文件中定义变量
+				List<String> strList = new ArrayList<String>();
+				strList.add("第一个值");
+				strList.add("第二个值");
+				strList.add("第三个值");
+		在页面中获取变量：
+					<#list strList as item>
+							${item!}<br/> ­­取值
+					 </#list>
+			展示结果：
+								第一个值
+								第二个值
+								第三个值
+(8)对Map集合进行取值
+	<#list map?keys as key>
+			${key}:${map[key]}
+	</#list>
+	示例：
+      在后台文件中定义变量
+        Map<String, Object> m = new HashMap<String,Object>();
+							m.put("name","姓名");
+							m.put("age",18);
+							m.put("sex","男");
+		在页面中获取变量：
+					<#list m?keys as key>
+							${key}:${m[key]}
+					</#list>
+				展示结果：
+							name：姓名
+							age：18
+							sex：男
+
+
+2、条件判断指令：
+(1) if
+
+格式：<#if 条件>
+          输出
+      </#if>
+      示例：
+     在页面中定义变量并判断条件：
+     			<#assign age = 18 /><br>
+     			<#if age == 18>
+                    <font color="red"> age = 18</font>
+               </#if>
+               展示结果：
+					   age = 18
+     
+(2) if ­ else
+格式：<#if 条件>
+         输出
+     <#else>
+         输出
+     </#if>
+     示例：
+在页面中定义变量并判断条件：
+						<#assign age = 20 /><br>
+						<#if age == 18>
+						          <font color="red"> age = 18</font>
+						<#else>
+						         <font color="red"> age != 18</font>
+						</#if>
+					展示结果：
+							age != 18
+(3) if ­ elseif ­ else
+格式：<#if 条件1>
+           输出
+     <#elseif 条件2>
+           输出
+    <#else>
+          输出
+    </#if>
+    示例：
+在页面中定义变量并判断条件：
+		<#assign age = 20 /><br>
+		<#if age &gt; 18>
+				 <font color="red">青年</font>
+		<#elseif age == 18>
+	      	    <font color="red"> 成年</font>
+		<#else>
+	        	<font color="red"> 少年</font>
+		</#if>
+		展示结果：
+						成年
+
+（基本语法参考教程：https://blog.csdn.net/weixin_44520739/article/details/88542911?utm_medium=distribute.pc_relevant.none-task-blog-baidulandingword-2&spm=1001.2101.3001.4242   或  
+https://blog.csdn.net/cq_liuqing/article/details/84917884?utm_medium=distribute.pc_relevant_t0.none-task-blog-BlogCommendFromMachineLearnPai2-1.control&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-BlogCommendFromMachineLearnPai2-1.control    或  
+https://blog.csdn.net/zhangdaiscott/article/details/77505453   ）
+

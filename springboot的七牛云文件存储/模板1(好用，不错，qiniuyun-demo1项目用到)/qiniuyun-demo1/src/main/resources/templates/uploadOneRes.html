@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>上传单个文件结果</title>
+</head>
+<body>
+<h1 style="color: greenyellow">上传单个图片结果：</h1>
+<p>Code:<span style="color: orange" th:text="${code}"></span></p>
+<p>Msg:<span style="color: orange" th:text="${msg}"></span></p>
+<p>Path:<span style="color: orange" th:text="${data}"></span></p>
+<p>图片显示:</p>
+<img th:src="@{${data}}" width="200" height="200"/>
+<!--<img src="http://qone06yje.hn-bkt.clouddn.com/2021-02-19-a545ed53,beed,49d8,b9e2,c4999d470ff9.png"/>-->
+</body>
+</html>

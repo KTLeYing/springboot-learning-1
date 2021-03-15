@@ -1,0 +1,14 @@
+【请求认证】 
+（1）在用户登录前，进行用户是否在线的检查和校验处理。用户登录后生成返回一个token、timestamp、sign（token+timestamp+username进行加密）给用户，用户以后每次请求都带token、timestamp、sign来请求，拦截器会获取对应的参数并校验来进行用户身份认证，每次请求都进行用户身份认证，token、timestamp、sign都不能为空；redis要存在token且正确；然后sign校验正确，这样用户身份认证才能通过，即单点登录成功，用户已经处于登录，无需再次登录。否则单点登录失败，要求用户进行重新登录（单点登录的处理类似用户身份认证的处理）
+（参考教程：https://mp.weixin.qq.com/s/GnEj0sg8R3XCQSOeeA7IDQ ）
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mzl.seckilldemo1.dao.UserDao">
+
+    <!--用户注册-->
+    <insert id="register">
+        insert into sk_user(id, nickname, password, salt, register_date, last_login_date, login_count)
+        values(#{id}, #{nickname}, #{password}, #{salt}, #{registerDate}, #{lastLoginDate}, #{loginCount})
+    </insert>
+
+    <!--从数据库中获取用户-->
+    <select id="getById" resultType="com.mzl.seckilldemo1.entity.User">
+        select * from sk_user
+        where id = #{id}
+    </select>
+
+</mapper>

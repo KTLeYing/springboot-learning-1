@@ -1,0 +1,24 @@
+（参考教程：https://blog.csdn.net/yuanlaijike/article/details/80249235）
+博主有话说：
+如代码所示，获取当前登录用户：SecurityContextHolder.getContext().getAuthentication()
+@PreAuthorize 用于判断用户是否有指定权限，没有就不能访问
+
+六、配置SpringSecurity
+6.1 UserDetailsService
+首先我们需要自定义 UserDetailsService ，将用户信息和权限注入进来。
+我们需要重写 loadUserByUsername 方法，参数是用户输入的用户名。返回值是UserDetails，这是一个接口，一般使用它的子类org.springframework.security.core.userdetails.User，它有三个参数，分别是用户名、密码和权限集。
+实际情况下，大多将 DAO 中的 User 类继承 org.springframework.security.core.userdetails.User 返回。
+
+
+6.2 WebSecurityConfig
+@Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+该类是 Spring Security 的配置类，该类的三个注解分别是标识该类是配置类、开启 Security 服务、开启全局 Securtiy 注解。
+首先将我们自定义的 userDetailsService 注入进来，在 configure() 方法中使用 auth.userDetailsService() 方法替换掉默认的 userDetailsService。
+
+这里我们还指定了密码的加密方式（5.0 版本强制要求设置），因为我们数据库是明文存储的，所以明文返回即可，如下所示：
+
+注意：
+（1）端登录页面表单的用户名的name一定是“username”， loadUserByUsername(String username)自动识别username匹配 
+（2）前端登录页面表单的密码的name一定是“password”， matches(CharSequence charSequence, String s)的charSequence参数自动识别password匹配

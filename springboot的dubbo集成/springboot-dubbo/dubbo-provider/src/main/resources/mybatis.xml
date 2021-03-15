@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true" />
+        <!-- 日志输出SQL语句 -->
+        <setting name="logPrefix" value="mapper."/>
+    </settings>
+    <!-- 配置SQL执行时间拦截器 -->
+    <plugins>
+        <plugin interceptor="com.example.demo.dubbo.mybatis.SqlCostInterceptor"></plugin>
+    </plugins>
+</configuration>

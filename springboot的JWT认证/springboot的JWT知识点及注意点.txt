@@ -1,0 +1,98 @@
+jwt请求认证的原理：第一次登录成功后，系统会生成一个token返回给客户端，用户之后法每一次请求都需要携带此token来进行访问其他的操作，系统会自动对请求携带的token进行校验，判断此token是否正确。
+
+1. 什么是JWT？
+
+JWT(JSON Web Token)是为了在网络应用环境间传递声明而执行的一种基于JSON的开放标准。
+
+它将用户信息加密到token里，服务器不保存任何用户信息。服务器通过使用保存的密钥验证token的正确性，只要正确即通过验证；应用场景如用户登录。JWT详细讲解请见 github：https://github.com/jwtk/jjwt
+
+2. 为什么使用JWT？
+
+随着技术的发展，分布式web应用的普及，通过session管理用户登录状态成本越来越高，因此慢慢发展成为token的方式做登录身份校验，然后通过token去取redis中的缓存的用户信息，随着之后jwt的出现，校验方式更加简单便捷化，无需通过redis缓存，而是直接根据token取出保存的用户信息，以及对token可用性校验，单点登录更为简单。
+
+3. 传统Cookie+Session与JWT对比
+
+① 在传统的用户登录认证中，因为http是无状态的，所以都是采用session方式。用户登录成功，服务端会保证一个session，当然会给客户端一个sessionId，客户端会把sessionId保存在cookie中，每次请求都会携带这个sessionId。
+
+cookie+session这种模式通常是保存在内存中，而且服务从单服务到多服务会面临的session共享问题，随着用户量的增多，开销就会越大。而JWT不是这样的，只需要服务端生成token，客户端保存这个token，每次请求携带这个token，服务端认证解析就可。
+
+② JWT方式校验方式更加简单便捷化，无需通过redis缓存，而是直接根据token取出保存的用户信息，以及对token可用性校验，单点登录，验证token更为简单。
+
+4. JWT的组成（3部分）
+第一部分为头部（header)，第二部分我们称其为载荷（payload)，第三部分是签证（signature)。【中间用 . 分隔】
+所以通俗的来讲，token = base64（header） + "." + base64(payload) + "." + 签名
+
+一个标准的JWT生成的token格式如下：eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNTY1NTk3MDUzLCJleHAiOjE1NjU2MDA2NTN9.qesdk6aeFEcNafw5WFm-TwZltGWb1Xs6oBEk5QdaLzlHxDM73IOyeKPF_iN1bLvDAlB7UnSu-Z-Zsgl_dIlPiw
+
+-----JWT长什么样 ----------
+JWT由3个子字符串组成，分别为Header，Payload以及Signature，结合JWT的格式即：Header.Payload.Signature。（Claim是描述Json的信息的一个Json，将Claim转码之后生成Payload）。 
+Header >>>
+Header是由以下这个格式的Json通过Base64编码（编码不是加密，是可以通过反编码的方式获取到这个原来的Json，所以JWT中存放的一般是不敏感的信息）生成的字符串，Header中存放的内容是说明编码对象是一个JWT以及使用“SHA-256”的算法进行加密（加密用于生成Signature） 
+
+{ 
+"typ":"JWT", 
+"alg":"HS256" 
+} 
+
+Claim >>>
+Claim是一个Json，Claim中存放的内容是JWT自身的标准属性，所有的标准属性都是可选的，可以自行添加，比如：JWT的签发者、JWT的接收者、JWT的持续时间等；同时Claim中也可以存放一些自定义的属性，这个自定义的属性就是在用户认证中用于标明用户身份的一个属性，比如用户存放在数据库中的id，为了安全起见，一般不会将用户名及密码这类敏感的信息存放在Claim中。将Claim通过Base64转码之后生成的一串字符串称作Payload。 
+{ 
+"iss":"Issuer —— 用于说明该JWT是由谁签发的", 
+"sub":"Subject —— 用于说明该JWT面向的对象", 
+"aud":"Audience —— 用于说明该JWT发送给的用户", 
+"exp":"Expiration Time —— 数字类型，说明该JWT过期的时间", 
+"nbf":"Not Before —— 数字类型，说明在该时间之前JWT不能被接受与处理", 
+"iat":"Issued At —— 数字类型，说明该JWT何时被签发", 
+"jti":"JWT ID —— 说明标明JWT的唯一ID", 
+"user-definde1":"自定义属性举例", 
+"user-definde2":"自定义属性举例" 
+} 
+
+Signature >>>
+Signature是由Header和Payload组合而成，将Header和Claim这两个Json分别使用Base64方式进行编码，生成字符串Header和Payload，然后将Header和Payload以Header.Payload的格式组合在一起形成一个字符串，然后使用上面定义好的加密算法和一个密匙（这个密匙存放在服务器上，用于进行验证）对这个字符串进行加密，形成一个新的字符串，这个字符串就是Signature。
+
+5. JWT验证流程和特点
+
+验证流程：
+
+① 在头部信息中声明加密算法和常量， 然后把header使用json转化为字符串
+② 在载荷中声明用户信息，同时还有一些其他的内容；再次使用json 把载荷部分进行转化，转化为字符串
+③ 使用在header中声明的加密算法和每个项目随机生成的secret来进行加密， 把第一步分字符串和第二部分的字符串进行加密， 生成新的字符串。词字符串是独一无二的。
+④ 解密的时候，只要客户端带着JWT来发起请求，服务端就直接使用secret进行解密。
+
+特点：
+
+① 三部分组成，每一部分都进行字符串的转化
+② 解密的时候没有使用数据库，仅仅使用的是secret进行解密
+③ JWT的secret千万不能泄密！
+
+6. JWT优缺点
+
+优点：
+
+①. 可扩展性好
+
+应用程序分布式部署的情况下，Session需要做多机数据共享，通常可以存在数据库或者Redis里面。而JWT不需要。
+
+②. 无状态
+
+JWT不在服务端存储任何状态。RESTful API的原则之一是无状态，发出请求时，总会返回带有参数的响应，不会产生附加影响。用户的认证状态引入这种附加影响，这破坏了这一原则。另外JWT的载荷中可以存储一些常用信息，用于交换信息，有效地使用 JWT，可以降低服务器查询数据库的次数。
+
+缺点：
+
+① 安全性：由于JWT的payload是使用Base64编码的，并没有加密，因此JWT中不能存储敏感数据。而Session的信息是存在服务端的，相对来说更安全。
+
+② 性能：JWT太长。由于是无状态使用JWT，所有的数据都被放到JWT里，如果还要进行一些数据交换，那载荷会更大，经过编码之后导致JWT非常长，Cookie的限制大小一般是4k，cookie很可能放不下，所以JWT一般放在LocalStorage里面。并且用户在系统中的每一次Http请求都会把JWT携带在Header里面，Http请求的Header可能比Body还要大。而SessionId只是很短的一个字符串，因此使用JWT的Http请求比使用Session的开销大得多。
+
+③ 一次性：无状态是JWT的特点，但也导致了这个问题，JWT是一次性的。想修改里面的内容，就必须签发一个新的JWT。即缺陷是一旦下发，服务后台无法拒绝携带该jwt的请求（如踢除用户）
+
+（1）无法废弃：通过JWT的验证机制可以看出来，一旦签发一个JWT，在到期之前就会始终有效，无法中途废弃。例如你在payload中存储了一些信息，当信息需要更新时，则重新签发一个JWT，但是由于旧的jwt还没过期，拿着这个旧的JWT依旧可以登录，那登录后服务端从JWT中拿到的信息就是过时的。为了解决这个问题，我们就需要在服务端部署额外的逻辑，例如设置一个黑名单，一旦签发了新的JWT，那么旧的就加入黑名单（比如存到redis里面），避免被再次使用。
+
+（2）续签：如果你使用jwt做会话管理，传统的Cookie续签方案一般都是框架自带的，Session有效期30分钟，30分钟内如果有访问，有效期被刷新至30分钟。一样的道理，要改变JWT的有效时间，就要签发新的JWT。最简单的一种方式是每次请求刷新JWT，即每个HTTP请求都返回一个新的JWT。这个方法不仅暴力不优雅，而且每次请求都要做JWT的加密解密，会带来性能问题。另一种方法是在Redis中单独为每个JWT设置过期时间，每次访问时刷新JWT的过期时间。
+
+可以看出想要破解JWT一次性的特性，就需要在服务端存储jwt的状态。但是引入 redis 之后，就把无状态的jwt硬生生变成了有状态了，违背了JWT的初衷。而且这个方案和Session都差不多了
+
+7.JWT实现认证的原理 
+服务器在生成一个JWT之后会将这个JWT会以Authorization : Bearer JWT 键值对的形式存放在cookies里面发送到客户端机器，用户在浏览器客户端每一次请求都会带上生成的token来进行请求，在客户端再次访问收到JWT保护的资源URL链接的时候，服务器会获取到cookies中存放的JWT信息，首先将Header进行反编码获取到加密的算法，在通过存放在服务器上的密匙对Header.Payload 这个字符串进行加密，比对JWT中的Signature和实际加密出来的结果是否一致，如果一致那么说明该JWT是合法有效的，认证成功，否则认证失败。
+
+（参考教程：https://mp.weixin.qq.com/s/ZkCAd64Ism2epQQkTu0_DQ ）

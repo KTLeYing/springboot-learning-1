@@ -1,0 +1,60 @@
+注意【易错】：在Jpa里面，每个JpaRepository接口类的abcDAO一定要返回对应的实体类abcEntity（除非返回基本数据类型或引用类型）：
+eg：
+在   public interface DbCollectProductionDAO extends JpaRepository<DbCollectProduction, Long>, JpaSpecificationExecutor<DbCollectProductionDAO> {
+}      的接口类只能返回的对应实体类DbCollectProduction对象或DbCollectProduction类里面的属性，一定不能返回其他的实体类，不然报错，因为jpa定义指定的实体类与真正返回的实体类对应不上。
+#####但是如果想多表联合查询直接返回多个表中的多个属性组合的话，有以下3种方法来解决#####
+----------------方法1-------------------------
+ 但是如果想多表联合查询直接返回多个表中的多个属性组合的话，可以再JpaRepository先返回Object，然后再在serviceImpl层来处理Obiect（是list来的，每个list下标元素代表着一行数据），先把object转换为array数组，在一个获取array的下标值（即一行数据对应的属性值），最后通过自定义的dto数据传输对象返回到前端。（但是要注意返回的字段是否为空，否则出现空指针异常）
+【注意：JPQL和原生的SQL都可以使用】
+具体参考 模板4(springdemo3)项目，在UserController控制器里的最后那几个接口 
+-------------方法2（方便，好用，安全）-------------------
+直接使用DTO传输对象的构造方法，在JPQL查询时直接new创建严格dto对象并把相关的属性投影到相应的构造方法的参数里面，然后给构造方法里面的属性赋值,这样就可以间接在repository里面使用并返回自定义的DTO对象了
+【注意：(1)可以在dto里面定义多个不同参数的构造方法去使用; (2)只能使用JPQL，不能用原生的SQL ；(3)数据库表字段名一定要用下划线形式命名，而实体类对应用驼峰式命名，不然会导致查询结果出错为空】
+具体参考 模板4(springdemo3)项目，在UserController控制器里的最后那几个接口 
+-------------方法3-------------------
+使用Map<String, Object>，如果是返回多条数据，则使用List接收Map，即List<Map<String, Object>>, jpa查询自动调用map.put()函数把字段列名赋值给Map的key，把字段名对应的值赋给Map的value，最后通过map.get()函数获取map的值来给自定义DTO设置属性值，把dto数据传输对象返回到前端。（原理跟Object有点相似，但是要注意返回的字段是否为空，否则出现空指针异常）
+【注意：只能用原生的SQL，不能用JPQL】
+具体参考 模板4(springdemo3)项目，在UserController控制器里的最后那几个接口 
+
+
+
+ JPQL和原生的SQL（springboot的jpa知识）
+（1）JPQL：(不需要设置nativeQuery=true)-----------------------------------------
+     * 注意：不要设置nativeQuery=true，它用于原生的SQL，直接写语句就行。
+     *@Query注解查询使用于所查询的数据无法通过关键字查询得到结果的查询。这种查询可以摆脱像关键字查询那样的约束，
+     * 将查询直接在相应的接口方法中声明，结构更为清晰，这是Spring Data的特有实现。
+     * JPQL并不支持INSERT语句，但可以使用UPDATE和DELETE语句，要想使用UPDATE或DELETE语句则需要在     *@Query注解上@Modifying注解，以通知该JPQL为更新或删除操作。
+    * @Modifying
+     * 1：在@Query注解中编写JPQL实现DELETE和UPDATE操作的时候必须加上@Modifying注解，以通知Springdata这是一个DELETE或UPDATE操作。
+     * 2：UPDATE或DELETE操作需要使用事务，此时需要定义Service层，在Service层的方法上添加事务操作。
+     * 3：注意JOQL不支持INSERT操作。
+     【注:使用JPQL语句来更新或删除操作，会使用事务。此时需要开启事务来使用。否则会报不支持DML错误。此时可以采用Spring的基于AOP的XML配置的声明式事务或@Transactional注解的事务[使用注解方式需spring开启事务注解驱动】。
+例子：(用实体类名Employee代替数据库表名)
+1、占位符形式:   (注意： 占位符从 1 开始)
+@Query("select e from Employee e where e.name=?1 and e.age=?2")
+List<Employee> queryParams1(String name, Integer age);
+2、命名参数形式
+@Query(value = "select e from Employee e where e.name=:name and e.age=:age")
+List<Employee> queryParams2(@Param("name") String name, @Param("age") Integer age);
+3、删除、更新和添加要用@Modifying
+@Modifying
+@Query("update Employee e set e.age = :age where e.id = :id")
+void update(@Param("id") Integer id, @Param("age") Integer age);
+
+（2）原生的SQL（和一般数据库一样的）--------------------------------------------------------
+     *注意JOQL不支持INSERT操作，可以使用原生的SQL代替
+     * 注释：当设置nativeQuery=true即可以使用原生SQL进行查询
+    *在@Query注解中编写JPQL实现DELETE、UPDATE和INSERT操作的时候必须加上@Modifying注解
+例子：
+1、占位符形式：
+@Query(name = "findStuByName", nativeQuery = true, value = "select * from student where name = ?1 ")
+Student findStuByName(String name);
+2、命名参数形式：
+ @Query(name = "findStuByName", nativeQuery = true, value = "select * from student where name = :name ")
+Student findStuByName(@Param("name") String name);
+3、插入（更新update、删除delete也要用@Modifying）：
+@Modifying
+@Query(name = "addStudent", nativeQuery = true, value = "insert into(username, password) student values(:username, :password) ")
+void addStudent(@Param("username") String username, @Param("password") String password);
+
+

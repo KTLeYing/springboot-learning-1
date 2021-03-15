@@ -1,0 +1,297 @@
+【AOP中需注意，常错】
+在使用AOP的时候，在后端controller接口中，接口方法名的定义不能和请求映射路径名一样，
+即这里路径名为@RequestMapping("/error")，接口方法名就不能是public Object error() {} 了， /后面的请求路径名不能和方法名一致，因为是AOP的后置异常通知的影响,不能同时映射一个名字,不然springboot启动会报错
+例子1：【正确】
+    @RequestMapping("/doError")
+    public Object error() {
+        return 1/0;
+    }
+
+例子2：【报错，因为方法名和请求路径名一样了，都是error】
+    @RequestMapping("/error")
+    public Object error() {
+        return 1/0;
+    }
+
+
+【AOP的执行过程】
+情况1：环绕通知 = proceed()方法前面的 + 前置通知 + 目标方法（接口/切入点）执行，proceed()方法 + 目标方法返回结果通知 + 后置通知 + proceed()方法后面的 （proceed方法就是用于启动目标方法执行的）
+情况2：环绕通知 = proceed()方法前面的 + 前置通知 + 目标方法执行(接口/切入点)，proceed()方法 + 异常通知 + 后置通知 （proceed方法就是用于启动目标方法执行的）
+
+
+一、AOP介绍
+       AOP 全称是 Aspect Oriented Programming，即面向切面的编程，AOP 是一种开发理念。AOP通过提供另一种思考程序结构的方式来补充OOP。OOP中模块化的关键单元是类，而在AOP中，模块化单元是切面。 切面实现了跨越多种类型和对象的关注点（例如事务管理）的模块化。在Spring-AOP中，可以通过基于XML配置和@Aspect注释两种方式实现自定义切面。
+
+二、AOP原理
+       关于AOP原理，想必大家都知道。即通过代理模式为目标对象生产代理对象，并将横切逻辑插入到目标方法执行的前后。当然在实际使用中并非说的这么简单，也会遇到各种问题，在此就不进行详细介绍。感兴趣的同学可以去学习一下Spring-AOP源码。
+
+三、AOP相关概念
+（1）连接点-Join point
+       连接点是指程序执行过程中的一些点，比如方法调用，异常处理等，即能够被拦截的地方。在Spring AOP中，仅支持方法级别的连接点（Spring AOP是基于动态代理的，所以是方法拦截的），所以每一个方法都可以是一个连接点。
+
+（2）切点-Pointcut
+        切点是与连接点匹配的谓词。通知与切点的表达式相关联，并在切点匹配的任何连接点处运行（例如，执行具有特定名称的方法）。前面是官方文档的解释，基本上看了还是不知道切点是什么，简单的说切点就是具体定位的连接点，上面已经说过每个方法都可以是一个连接点，但实际上我们不会对项目所有的方法都要进行“特殊”处理，只有我们具体定位到的某一个方法就成为切点。
+
+（3）通知/增强 - Advice
+        某个方面在特定连接点处采取的操作，也就是具体横切需要执行的逻辑。如果说切点解决的是where的问题，那通知解决的就是when和how的问题。Spring-AOP中定义了以下几种通知类型：
+
+前置通知（Before advice）- 在目标方法调用前执行通知
+后置通知（After advice）- 在目标方法完成后执行通知
+返回通知（After returning advice）- 在目标方法执行成功后，调用通知
+异常通知（After throwing advice）- 在目标方法抛出异常后，执行通知
+环绕通知（Around advice）- 在目标方法调用前后均可执行自定义逻辑
+
+（4）切面-Aspect
+       切面由切点和通知组成，它既包括了横切逻辑的定义、也包括了连接点的定义。也就是说切面就可以解决对什么方法（where）在何时（when - 前置、后置或者环绕）执行什么样的横切逻辑（how）的三连发问题。
+
+（5）织入-Weaving
+       将切面与其他类型的应用程序或对象链接以创建增强型的对象，所谓织入就是在切点的引导下，将通知逻辑插入到方法调用上，使得我们的通知逻辑在方法调用时得以执行。
+
+（6）引入/引介-Introduction
+       引入/引介允许我们向现有的类添加新方法或属性。是一种特殊的增强！
+
+
+四、 切面方法说明（6个）
+（1）------------@Pointcut 切入点------------：
+（A：）
+/**
+   * 指定切点：定义切入点，切入点为com.mzl.aopdemo1.controller下的所有函数, 匹配com.mzl.aopdemo1.controller包及其子包下的所有类的所有方法
+   * 作用是把当前类标识为一个切面供容器读取
+   *
+   * 创建一个切点，切面可以用通配符表示， 例如public （代表任意返回值类型）
+   * com.spring.controller.WebSiteController.(..)//（..）表示任意参数: 也可以指定方法如：public
+   * com.spring.controller.WebSiteController.view(..) 还可以任意类：public com.spring.controller..(..)都可以
+   *
+   * 1.@Pointcut是创建切入点 切入点方法不用写代码，返回类型为void
+   * execution:用于匹配表达式
+   * execution(modifiers-pattern? ret-type-pattern declaring-type-pattern?
+   * name-pattern(param-pattern)throws-pattern?) 修饰符匹配（modifier-pattern?）
+   * 返回值匹配（ret-type-pattern）可以为*表示任何返回值,全路径的类名等 类路径匹配（declaring-type-pattern?）
+   * 方法名匹配（name-pattern）可以指定方法名 或者 *代表所有, set* 代表以set开头的所有方法
+   * 参数匹配（(param-pattern)）可以指定具体的参数类型，多个参数间用“,”隔开，各个参数也可以用“*”来表示匹配任意类型的参数，如(String)表示匹配一个String参数的方法；(*,String)
+   * 表示匹配有两个参数的方法，第一个参数可以是任意类型，而第二个参数是String类型；可以用(..)表示零个或多个任意参数 异常类型匹配（throws-pattern?） 其中后面跟
+   * 着“?”的是可选项
+   * 1）execution(* *(..)) //表示匹配所有方法
+   * 2）execution(public * com. example.controller.*(..))  //表示匹配com. example.controller中所有的public方法
+   * 3）execution(* com. example.controller..*.*(..))  //表示匹配com. example.controller包及其子包下的所有方法
+   */
+
+（B：）
+二、常用切入点指示符
+1、execution表达式    （如果不配置execution则默认是针对拦截所有的路径）
+用于匹配方法执行的连接点，属于方法级别
+语法：
+execution(修饰符 返回值类型 方法名（参数）异常)
+
+ 语法参数	         描述
+修饰符	    可选，如public，protected，写在返回值前，任意修饰符填*号就可以
+返回值类型	必选，可以使用*来代表任意返回值
+方法名	   必选，可以用*来代表任意方法
+参数	  ()代表是没有参数，(..)代表是匹配任意数量，任意类型的参数，当然也可以指定类型的参数进行匹配，如要接受一个String类型的参数，则(java.lang.String), 任意数量的String类型参数：(java.lang.String..)等等。。。
+异常	  可选，语法：throws 异常，异常是完整带包名，可以是多个，用逗号分隔
+
+符号：
+符号	描述
+*	匹配任意字符
+…	匹配多个包或者多个参数
++	表示类及其子类
+
+条件符：
+符号	描述
+&&、and	与
+||	或
+!	非
+
+案例：
+拦截com.gj.web包下的所有子包里的任意类的任意方法
+execution(* com.gj.web..*.*(..))
+拦截com.gj.web.api.Test2Controller下的任意方法
+execution(* com.gj.web.api.Test2Controller.*(..))
+拦截任何修饰符为public的方法
+execution(public * * (..))
+拦截com.gj.web下的所有子包里的以ok开头的方法
+execution(* com.gj.web..*.ok*(..))
+更多用法大家可以根据语法自行设计，本文不在进行举例
+
+2、@annotation
+根据所应用的注解对方法进行过滤
+语法：
+@annotation(注解全路径)
+实例：
+对用了com.gj.annotations.Test注解的所有方法进行拦截
+@annotation(com.gj.annotations.Test)
+
+3、Within
+根据类型（比如接口、类名或者包名过滤方法）进行拦截
+语法：
+within(typeName)
+示例：
+
+对com.gj.web下的所有子包的所有方法进行拦截
+within(com.gj.web..*)
+更多用法可以根据语法自行设计
+4、@Within
+用于匹配所有持有指定注解类型内的方法，与within是有区别的，within是用于匹配指定类型内的方法执行，而@within是指定注解类型内的方法
+
+5、bean
+Spring AOP扩展的，AspectJ没有对于它的指示符，用于匹配特定名称的bean对象的执行方法
+语法：
+bean(beanName)
+示例：
+bean(testController)
+
+（C：）
+定义切入点的时候需要一个包含名字和任意参数的签名，还有一个切入点表达式，如execution(public * com.example.aop...(..))
+
+切入点表达式的格式：execution([可见性]返回类型[声明类型].方法名(参数)[异常]) 
+其中[]内的是可选的，其它的还支持通配符的使用： 
+1) *：匹配所有字符 
+2) ..：一般用于匹配多个包，多个参数 
+3) +：表示类及其子类 
+4)运算符有：&&,||,!
+
+切入点表达式关键词用例： 
+1）execution：用于匹配子表达式。 
+//匹配com.cjm.model包及其子包中所有类中的所有方法，返回类型任意，方法参数任意 
+@Pointcut(“execution(* com.cjm.model...(..))”) 
+public void before(){}
+
+2）within：用于匹配连接点所在的Java类或者包。 
+//匹配Person类中的所有方法 
+@Pointcut(“within(com.cjm.model.Person)”) 
+public void before(){} 
+//匹配com.cjm包及其子包中所有类中的所有方法 
+@Pointcut(“within(com.cjm..*)”) 
+public void before(){}
+
+3） this：用于向通知方法中传入代理对象的引用。 
+@Before(“before() && this(proxy)”) 
+public void beforeAdvide(JoinPoint point, Object proxy){ 
+//处理逻辑 
+}
+
+4）target：用于向通知方法中传入目标对象的引用。 
+@Before(“before() && target(target) 
+public void beforeAdvide(JoinPoint point, Object proxy){ 
+//处理逻辑 
+}
+
+5）args：用于将参数传入到通知方法中。 
+@Before(“before() && args(age,username)”) 
+public void beforeAdvide(JoinPoint point, int age, String username){ 
+//处理逻辑 
+}
+
+6）@within ：用于匹配在类一级使用了参数确定的注解的类，其所有方法都将被匹配。 
+@Pointcut(“@within(com.cjm.annotation.AdviceAnnotation)”) 
+－ 所有被@AdviceAnnotation标注的类都将匹配 
+public void before(){}
+
+7）@target ：和@within的功能类似，但必须要指定注解接口的保留策略为RUNTIME。 
+@Pointcut(“@target(com.cjm.annotation.AdviceAnnotation)”) 
+public void before(){}
+
+8）@args ：传入连接点的对象对应的Java类必须被@args指定的Annotation注解标注。 
+@Before(“@args(com.cjm.annotation.AdviceAnnotation)”) 
+public void beforeAdvide(JoinPoint point){ 
+//处理逻辑 
+}
+
+9）@annotation ：匹配连接点被它参数指定的Annotation注解的方法。也就是说，所有被指定注解标注的方法都将匹配。
+@Pointcut(“@annotation(com.cjm.annotation.AdviceAnnotation)”) 
+public void before(){}
+
+10）bean：通过受管Bean的名字来限定连接点所在的Bean。该关键词是Spring2.5新增的。 
+@Pointcut(“bean(person)”) 
+public void before(){}
+
+例如：
+@Pointcut("execution(public * com.mzl.aopdemo1.controller.*.*(..))")
+  public void webLog() {}
+
+（2） ------------@Before 前置通知------------:
+ 前置通知：在连接点之前执行的通知,即法调用前被调用(执行方法前，根据切点规则拦截),标识一个前置增强方法，相当于BeforeAdvice的功能
+
+例如
+@Before("webLog()")
+public void doBefore(JoinPoint joinPoint) throws Throwable{
+
+}
+
+（3）------------@AfterReturning 后置返回通知------------：
+ 后置返回通知，方法运行后执行,后置增强，相当于AfterReturningAdvice，方法退出时执行
+  这里需要注意的是:  如果参数中的第一个参数为JoinPoint，则第二个参数为返回值的信息
+  如果参数中的第一个参数不为JoinPoint，则第一个参数为returning中对应的参数
+returning 限定了只有目标方法返回值与通知方法相应参数类型时才能执行后置返回通知，否则不执行，对于returning对应的通知方法参数为Object类型将匹配任何目标返回值
+     
+例如：
+    @AfterReturning(returning = "ret", pointcut = "webLog()")
+    public void doAfterReturning(Object ret) throws Throwable{
+ 
+    }
+
+ （4）------------ @AfterThrowing  后置异常通知------------：
+ 后置异常通知，异常抛出增强，相当于ThrowsAdvice
+ 定义一个名字，该名字用于匹配通知实现方法的一个参数名，当目标方法抛出异常返回后，将把目标方法抛出的异常传给通知方法；
+throwing 限定了只有目标方法抛出的异常与通知方法相应参数异常类型时才能执行后置异常通知，否则不执行，对于throwing对应的通知方法参数为Throwable类型将匹配任何异常。
+
+例如：
+    @AfterThrowing(value = "webLog()")
+//    @AfterThrowing("webLog()")
+    public void doAfterThrowing(JoinPoint joinPoint){
+     
+    }
+
+（5）------------@After 后置最终通知------------：
+  后置最终通知,final增强，不管是抛出异常或者正常退出都会执行，退出方法时执行
+
+例如：
+    @After("webLog()")
+    public void doAfter(JoinPoint joinPoint) throws Throwable{
+       
+    }
+
+（6）------------@Around 环绕通知------------：
+   环绕通知： 环绕增强，相当于MethodInterceptor（AOP拦截器）
+    环绕通知非常强大，可以决定目标方法是否执行，什么时候执行，执行时是否需要替换方法参数，执行完毕是否需要替换返回值。
+    (可以控制类中的方法是否可以执行，也可以修改参数，修改返回内容 ，植入方法处理逻辑)
+    环绕通知第一个参数必须是org.aspectj.lang.ProceedingJoinPoint类型
+环绕通知=前置+目标方法执行+后置通知，proceed方法就是用于启动目标方法执行的
+
+例如：
+  @Around("webLog()")
+  public Object doAround(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+        System.out.println("- - - - -  环绕通知 - - - - -");
+        System.out.println("环绕通知的目标方法名："+ proceedingJoinPoint.getSignature().getName());
+        try{
+            Object object = proceedingJoinPoint.proceed();
+            System.out.println("方法环绕proceed，结果是 :" + object);
+            return object;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally{
+            System.out.println("环绕通知 end !!!");
+        }
+      return null;
+    }
+
+
+五、AOP各方法参数说明
+各方法参数说明：
+     除了@Around外，每个方法里都可以加或者不加参数JoinPoint，如果有用JoinPoint的地方就加，不加也可以，JoinPoint里包含了类名 、被切面的方法名，参数等属性，可供读取使用。@Around参数必须为ProceedingJoinPoint，pjp.proceed相应于执行被切面的方法。
+ @AfterReturning方法里，可以加returning = “XXX”，XXX即为在controller里方法的返回值，本例中的返回值是“first controller”。
+  @AfterThrowing方法里，可以加throwing = "XXX"，供读取异常信息，如本例中可以改为：
+   //后置异常通知
+   @AfterThrowing(throwing = "ex", pointcut = "webLog()")
+     public void throwss(JoinPoint jp, Exception ex){
+           System.out.println("方法异常时执行.....");
+     }
+
+
+六、对于多个AOP切面类工作的原理：（参考项目：aop-demo1项目）
+spring aop就是一个同心圆，要执行的方法为圆心，最外层的order最小。从最外层按照AOP1、AOP2的顺序依次执行doAround方法，doBefore方法。然后执行method方法，最后按照AOP2、AOP1的顺序依次执行doAfter、doAfterReturn方法。也就是说对多个AOP来说，先before的，一定后after。
+对于上面的例子就是，先外层的就是对所有controller的切面，内层就是自定义注解的。
+那不同的切面，顺序怎么决定呢，尤其是同格式的切面处理，譬如两个execution的情况，那spring就是随机决定哪个在外哪个在内了。
+所以大部分情况下，我们需要指定顺序，最简单的方式就是在Aspect切面类上加上@Order(1)注解即可，order越小最先执行，也就是位于最外层。像一些全局处理的就可以把order设小一点，具体到某个细节的就设大一点。
+  
+（参考教程：https://blog.csdn.net/Fine_Cui/article/details/103067087?utm_medium=distribute.pc_relevant.none-task-blog-baidujs_title-12&spm=1001.2101.3001.4242  或  https://blog.csdn.net/qq_33257527/article/details/82561635  或   https://blog.csdn.net/thebigdipperbdx/article/details/103789226?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-10.control&dist_request_id=&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-10.control    或    https://blog.csdn.net/dc282614966/article/details/103636763?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-9.control&dist_request_id=&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-9.control ）

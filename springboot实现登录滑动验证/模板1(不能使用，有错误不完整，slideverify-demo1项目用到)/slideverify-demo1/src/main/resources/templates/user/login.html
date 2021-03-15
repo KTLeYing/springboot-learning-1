@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>登入</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="fly,layui,前端社区">
+    <meta name="description" content="Fly社区是模块化前端UI框架Layui的官网社区，致力于为web开发提供强劲动力">
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <link rel="stylesheet" href="/css/global.css">
+    <style>
+        #captcha1 {
+            width: 200px;
+            display: inline-block;
+        }
+        .show {
+            display: block;
+            padding: 6px;
+        }
+        label {
+            vertical-align: top;
+            display: inline-block;
+            width: 80px;
+            text-align: right;
+        }
+        #wait1{
+            text-align: left;
+            color: #666;
+            margin: 0;
+        }
+        .message{
+            font-size: x-large;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<div class="fly-header layui-bg-black">
+    <div class="layui-container">
+        <a class="fly-logo" href="/">
+            <img src="/images/logo.png" alt="layui">
+        </a>
+        <ul class="layui-nav fly-nav layui-hide-xs">
+            <li class="layui-nav-item layui-this">
+                <a href="/"><i class="iconfont icon-jiaoliu"></i>交流</a>
+            </li>
+            <li class="layui-nav-item">
+                <a href="#"><i class="iconfont icon-iconmingxinganli"></i>案例</a>
+            </li>
+            <li class="layui-nav-item">
+                <a href="#" target="_blank"><i class="iconfont icon-ui"></i>框架</a>
+            </li>
+        </ul>
+
+        <ul class="layui-nav fly-nav-user">
+            <!-- 未登入的状态 -->
+            <li class="layui-nav-item">
+                <a class="iconfont icon-touxiang layui-hide-xs" href="user/login.html"></a>
+            </li>
+            <li class="layui-nav-item">
+                <a href="">登入</a>
+            </li>
+            <li class="layui-nav-item">
+                <a href="reg">注册</a>
+            </li>
+            <li class="layui-nav-item layui-hide-xs">
+                <a href="/app/qq/" onclick="layer.msg('正在通过QQ登入', {icon:16, shade: 0.1, time:0})" title="QQ登入" class="iconfont icon-qq"></a>
+            </li>
+            <li class="layui-nav-item layui-hide-xs">
+                <a href="/app/weibo/" onclick="layer.msg('正在通过微博登入', {icon:16, shade: 0.1, time:0})" title="微博登入" class="iconfont icon-weibo"></a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="layui-container fly-marginTop">
+    <div class="fly-panel fly-panel-user" pad20>
+        <div class="layui-tab layui-tab-brief" lay-filter="user">
+            <ul class="layui-tab-title">
+                <li class="layui-this">登入</li>
+                <li><a href="reg">注册</a></li>
+            </ul>
+            <div class="layui-form layui-tab-content" id="LAY_ucm" style="padding: 20px 0;">
+                <div class="layui-tab-item layui-show">
+                    <div class="layui-form layui-form-pane">
+                        <p class="message" th:text="*{message}"></p>
+                        <form method="post" action="verifyLogin">
+                            <div class="layui-form-item">
+                                <label for="L_LoginName" class="layui-form-label">账号</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" id="L_loginName" name="loginName" required lay-verify="required" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label for="L_password" class="layui-form-label">密码</label>
+                                <div class="layui-input-inline">
+                                    <input type="password" id="L_password" name="password" required lay-verify="required" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">完成验证</label>
+                                <div id="captcha1">
+                                    <p id="wait1" class="show">正在加载验证码......</p>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <button id="submit" class="layui-btn" lay-filter="login" lay-submit>立即登录</button>
+                                <span style="padding-left:20px;">
+                  <a href="#">忘记密码？</a>
+                </span>
+                            </div>
+                            <div class="layui-form-item fly-form-app">
+                                <span>或者使用社交账号登入</span>
+                                <a href="#" onclick="layer.msg('正在通过QQ登入', {icon:16, shade: 0.1, time:0})" class="iconfont icon-qq" title="QQ登入"></a>
+                                <a href="#" onclick="layer.msg('正在通过微博登入', {icon:16, shade: 0.1, time:0})" class="iconfont icon-weibo" title="微博登入"></a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="fly-footer">
+    <p><a href="#" >Fly社区</a> 2017 &copy; <a href="#">layui.com 出品</a></p>
+    <p>
+        <a href="#" >付费计划</a>
+        <a href="#" >获取Fly社区模版</a>
+        <a href="#" >微信公众号</a>
+    </p>
+</div>
+
+<script src="http://apps.bdimg.com/libs/jquery/1.9.1/jquery.js"></script>
+<script src="/layui/layui.js"></script>
+<!-- 引入 gt.js，既可以使用其中提供的 initGeetest 初始化函数 -->
+<script src="/js/gt.js"></script>
+
+<script>
+    layui.use(['form', 'layer'], function () {
+        var form = layui.form,
+            layer = parent.layer === undefined ? layui.layer : parent.layer;
+
+    });
+    var handler = function (captchaObj) {
+        $("#submit").click(function (e) {
+            var result = captchaObj.getValidate();
+            if (!result) {
+                $("#notice1").show();
+                setTimeout(function () {
+                    $("#notice1").hide();
+                }, 2000);
+                e.preventDefault();
+            }
+        });
+        // 将验证码加到id为captcha的元素里，同时会有三个input的值用于表单提交
+        captchaObj.appendTo("#captcha1");
+        captchaObj.onReady(function () {
+            $("#wait1").hide();
+        });
+    };
+    $.ajax({
+        url: "startCaptcha?t=" + (new Date()).getTime(), // 加随机数防止缓存
+        type: "get",
+        dataType: "json",
+        success: function (data) {
+            // 调用 initGeetest 初始化参数
+            // 参数1：配置参数
+            // 参数2：回调，回调的第一个参数验证码对象，之后可以使用它调用相应的接口
+            initGeetest({
+                gt: data.gt,
+                challenge: data.challenge,
+                new_captcha: data.new_captcha, // 用于宕机时表示是新验证码的宕机
+                offline: !data.success, // 表示用户后台检测极验服务器是否宕机，一般不需要关注
+                product: "float", // 产品形式，包括：float，popup
+                width: "100%"
+            }, handler);
+        }
+    });
+</script>
+</body>
+</html>

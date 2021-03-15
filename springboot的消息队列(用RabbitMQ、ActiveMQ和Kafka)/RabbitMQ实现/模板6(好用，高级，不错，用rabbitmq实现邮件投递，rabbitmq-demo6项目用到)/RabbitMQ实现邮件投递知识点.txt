@@ -1,0 +1,8 @@
+说明:
+本文涵盖了关于RabbitMQ很多方面的知识点, 如:
+消息发送确认机制
+消费确认机制
+消息的重新投递
+消费幂等性, 等等
+
+（参考教程：https://www.jianshu.com/p/dca01aad6bc8  或    https://mp.weixin.qq.com/s?__biz=MzI2NzUxNjIyOA==&mid=2247484791&idx=1&sn=cbb9c381f3293771f0be9097e9262a3f&chksm=eafce55cdd8b6c4a590bc21443ff002deb1ed827858c82a966ea05af66087102826cd878c66c&mpshare=1&scene=1&srcid=1127hHo2pX0t6kVNrsz0J6I7&sharer_sharetime=1606446905247&sharer_shareid=f34cf208deb08d1b6c9b70c7fab0fbe9&key=2f651b0c09f1461e25ae0b38f5e3885c6a32cf707e70b147eaedead6e6ff124df72c78d6a94166731e4ec444bb7c30a9f79e72ac66aa354af5673b115e15e0bea4336423d17e98a635573b6f0c7023cead1b4e7f781deae07e779bb393f4c2e7cebfe6b4a1db9c152850edb0224dd36b7e58f29d5996f9fb2f187b15fad8e770&ascene=1&uin=MzExNDE3MjQ2Mw%3D%3D&devicetype=Windows+10+x64&version=6300002f&lang=zh_CN&exportkey=A1JcYVBWzJYGx%2BAWRtO79%2FU%3D&pass_ticket=O2yRpdAF%2BhnHpykk9XS2pIWtqoOldDY9JeDtvOImz3TdQRTPG0qMDwbtF17RQvZG&wx_header=0 ）

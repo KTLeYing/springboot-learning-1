@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="UTF-8">
+<title>微信登录二维码</title>
+<script src="http://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
+<script src="/js/qrcode.js"></script>
+</head>
+
+ <script type="text/javascript">
+
+  /*  $(function(){
+	　　var div1 = document.getElementById("div1");
+	　　alert(div1);
+ }) */
+  var c = null;
+  function getInfoJson(){
+   $.ajax({
+    url: "/getInfoJson",
+    type: "get",
+    success: function (data) {
+     if(data != "no"){
+      $("#userinfo").html(data);
+      //登录成功，取消监听
+      clearInterval(c);
+     }
+    }
+   });
+  }
+
+    function wechatLogin(){
+    	$.ajax({
+            url: "/wxLoginPage",
+            type: "POST",
+            success: function (data) {
+            	$("#sessionId").val(data.sessionId);
+            	//生成二维码
+            	var qrcode = new QRCode(document.getElementById("code"), {
+                    width : 200,
+                    height : 200
+                });
+                qrcode.makeCode(data.uri);
+                //监听是否成功登录(每秒执行一次 getInfoJson方法)
+                c  = setInterval(getInfoJson,1000);
+            }
+    	});
+    }
+</script>
+
+<body>
+<input type="button" value="微信登录" th:onclick="wechatLogin()" />
+<input type="hidden" id="sessionId"/>
+<br/><br/><br/><br/>
+<div id="code"></div> 
+<div id="userinfo"></div> 
+</body>
+</html>
+

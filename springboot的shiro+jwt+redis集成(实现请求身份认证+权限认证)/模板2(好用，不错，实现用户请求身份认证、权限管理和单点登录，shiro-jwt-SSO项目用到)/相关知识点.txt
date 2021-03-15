@@ -1,0 +1,116 @@
+【jwt+shiro+redis请求认证和权限管理的核心原理过程】 
+（1）用户登录后生成返回一个token，用户以后每次请求都带这个token来请求，自定义realm帮助shiro安全认证管理器进行用户身份认证，在realm中使用jwt过滤器进行一系列完整的认证处理，每次请求都进行用户身份认证，token不能为空，redis要存在token，用户请求的token要正确，用户请求的token要与redis的保持一致，用户一样在数据库存在请未被封号，满足以上的所有要求，用户身份认证才能通过（2）用户身份认证通过后，如果请求要求进行权限认证的，自定义realm帮助shiro安全认证管理器进行权限认证。（3）用户身份认证和权限认证通过后才能放行执行请求的接口。
+（参考教程：https://blog.csdn.net/qq_42109746/article/details/97102231）
+
+
+【shiro默认的过滤器】
+#rest:例子/admins/user/**=rest[user],根据请求的方法，相当于/admins/user/**=perms[user:method] ,其中method为post，get，delete等。
+#port：例子/admins/user/**=port[8081],当请求的url的端口不是8081是跳转到schemal://serverName:8081?queryString,其中schmal是协议http或https等，serverName是你访问的host,8081是url配置里port的端口，queryString
+是你访问的url里的？后面的参数。
+#perms：例子/admins/user/**=perms[user:add:*],perms参数可以写多个，多个时必须加上引号，并且参数之间用逗号分割，例如/admins/user/**=perms["user:add:*,user:modify:*"]，当有多个参数时必须每个参数都通过才通过，想当于
+isPermitedAll()方法。
+#roles：例子/admins/user/**=roles[admin],参数可以写多个，多个时必须加上引号，并且参数之间用逗号分割，当有多个参数时，例如/admins/user/**=roles["admin,guest"],每个参数通过才算通过，相当于hasAllRoles()方法。
+#anon:例子/admins/**=anon 没有参数，表示可以匿名使用。
+#authc:例如/admins/user/**=authc表示需要认证才能使用，没有参数
+#authcBasic：例如/admins/user/**=authcBasic没有参数表示httpBasic认证
+#ssl:例子/admins/user/**=ssl没有参数，表示安全的url请求，协议为https
+#user:例如/admins/user/**=user没有参数表示必须存在用户，当登入操作时不做检查
+
+这些过滤器分为两组，一组是认证过滤器，一组是授权过滤器。其中anon，authcBasic，authc，user是第一组，
+perms，roles，ssl，rest，port是第二组
+
+#URL 匹配模式
+url模式使用Ant 风格模式
+Ant 路径通配符支持?、*、**，注意通配符匹配不包括目录分隔符“/”：
+　　　　–  ?：匹配一个字符，如/admin? 将匹配/admin1，但不匹配/admin 或/admin/；
+　　　　– *：匹配零个或多个字符串，如/admin 将匹配/admin、/admin123，但不匹配/admin/1；
+　　　　– **：匹配路径中的零个或多个路径，如/admin/** 将匹配/admin/a 或/admin/a/b
+
+#URL 匹配顺序
+URL 权限采取第一次匹配优先的方式，即从头开始使用第一个匹配的url模式对应的拦截器链。
+如：
+　　　　– /bb/**=filter1
+　　　　– /bb/aa=filter2
+　　　　– /**=filter3
+　　　　– 如果请求的url是“/bb/aa”，因为按照声明顺序进行匹配，那么将使用filter1 进行拦截。
+（参考教程：https://blog.csdn.net/weixin_33968104/article/details/92039594）
+
+
+【权限和角色的配置（可以使用对应的注解，也可以使用shiro的配置类来配置）】
+方式一：使用权限或角色注解
+<==>@RequiresAuthentication
+验证用户是否登录，等同于方法subject.isAuthenticated() 结果为true时。
+<==>@RequiresUser
+验证用户是否被记忆，user有两种含义：
+一种是成功登录的（subject.isAuthenticated() 结果为true）；
+另外一种是被记忆的（subject.isRemembered()结果为true）。
+<==>@RequiresGuest
+验证是否是一个guest的请求，与@RequiresUser完全相反。
+ 换言之，RequiresUser  == !RequiresGuest。
+此时subject.getPrincipal() 结果为null.
+<==>@RequiresRoles
+例如：
+@RequiresRoles("aRoleName");
+  void someMethod();
+或
+@RequiresRoles(value = "aRoleName");
+  void someMethod();
+如果subject中有aRoleName角色才可以访问方法someMethod。如果没有这个权限则会抛出异常AuthorizationException
+@RequiresRoles(value = {"user", "admin"});
+  void someMethod();
+或
+@RequiresRoles({"user", "admin"});
+  void someMethod();
+要求subject中必须同时含有user和admin的角色才能执行方法someMethod()。否则抛出异常
+<==>@RequiresPermissions
+例如：
+ @RequiresPermissions("read")
+  void someMethod();
+或
+@RequiresPermissions(value = "read")
+  void someMethod();
+或
+ @RequiresPermissions({"file:read", "write:aFile.txt"} )
+  void someMethod();
+或
+ @RequiresPermissions(value = {"delete", "add"})
+ void someMethod();
+要求subject中必须同时含有file:read和write:aFile.txt的权限才能执行方法someMethod()。否则抛出异常AuthorizationException。
+
+方式二：使用shiro的配置类
+  DefaultShiroFilterChainDefinition chainDefinition = new DefaultShiroFilterChainDefinition();
+        // logged in users with the 'admin' role
+        chainDefinition.addPathDefinition("/admin/**", "authc, roles[admin]");
+        // logged in users with the 'document:read' permission
+        chainDefinition.addPathDefinition("/docs/**", "authc, perms[document:read]");
+        chainDefinition.addPathDefinition("/login", "anon");
+        chainDefinition.addPathDefinition("/doLogin", "anon");
+        // all other paths require a logged in user
+        chainDefinition.addPathDefinition("/**", "authc");
+        return chainDefinition;
+或
+ Map<String, String> filterChainDefinitionManager = new LinkedHashMap<String, String>();
+        filterChainDefinitionManager.put("/logout", "logout");   //登出管理
+        filterChainDefinitionManager.put("/users/getById/**", "authc,roles[user]");    //请求路径/users下资源全部拦截(需登陆后和有有权限才能查看)
+        filterChainDefinitionManager.put("/users/**", "authc,roles[admin]");   //请求路径/users下资源全部拦截(需登陆后和有有权限才能查看)，参数可写多个,多个时必须加上引号,且参数之间用逗号分割
+        filterChainDefinitionManager.put("/events/**", "authc,roles[ROLE_ADMIN]");  //请求路径/events下资源全部拦截(需登陆后和有有权限才能查看)
+//        filterChainDefinitionManager.put("/user/edit/**", "authc,perms[user:edit]");// 这里为了测试，固定写死的值，也可以从数据库或其他配置中读取
+        filterChainDefinitionManager.put("/**", "anon"); // 静态资源不拦截,anno是用来释放资源
+        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionManager);
+
+        // 如果不设置默认会自动寻找Web工程根目录下的"/login.jsp"页面
+        shiroFilterFactoryBean.setLoginUrl("/login");
+        shiroFilterFactoryBean.setSuccessUrl("/");  // 登录成功后要跳转的连接的路径
+        shiroFilterFactoryBean.setUnauthorizedUrl("/403");  // 未授权界面，跳转的页面403
+        return shiroFilterFactoryBean;
+    }
+
+
+
+
+
+
+
+
+
+

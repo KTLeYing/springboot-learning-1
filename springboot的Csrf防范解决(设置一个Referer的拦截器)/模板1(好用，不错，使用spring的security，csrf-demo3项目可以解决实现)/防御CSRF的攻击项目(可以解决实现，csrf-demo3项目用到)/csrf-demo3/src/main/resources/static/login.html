@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录页面</title>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+</head>
+<body>
+<div>
+    <div>
+        <label>用户名：</label>
+        <input type="text" id="username">
+    </div>
+    <div>
+        <label>密码：</label>
+        <input type="password" id="password">
+    </div>
+    <input type="button" value="登录" id="loginBtn">
+</div>
+<script>
+    $("#loginBtn").click(function () {
+        let _csrf = $.cookie('XSRF-TOKEN');
+        $.post('/login.html',{username:$("#username").val(),password:$("#password").val(),_csrf:_csrf},function (data) {
+            alert(data);
+            window.location.href="/toIndex";
+        })
+    })
+</script>
+</body>
+</html>

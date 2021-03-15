@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>七牛云文件存储</title>
+</head>
+<body>
+<h1 style="color: greenyellow">上传单个图片：</h1>
+<form action="/upload" method="post" enctype="multipart/form-data">
+    <label>上传图片:</label>
+    <input type="file" name="file"/>
+    <input type="submit" value="上传"/>
+</form>
+
+<br>
+<br>
+<h1 style="color: greenyellow">上传多个图片：</h1>
+<form action="/uploadMore" method="post" enctype="multipart/form-data">
+    <div>
+        <label>图片1:</label>
+        <input type="file" name="file"/>
+    </div>
+    <div>
+        <label>图片2:</label>
+        <input type="file" name="file"/>
+    </div>
+    <div>
+        <label>图片3:</label>
+        <input type="file" name="file"/>
+    </div>
+    <input type="submit" value="上传"/>
+</form>
+
+</body>
+</html>

@@ -1,0 +1,150 @@
+【mybatis-plus常用的方法和条件构造器汇总】
+--------insert相关---------
+
+boolean insert(T entity); //插入
+eg:adminDAO.insert(admin);
+
+boolean insertSelective(T entity); //选择性插入，null字段不插入
+eg:
+
+boolean insertBatch(List<T> entityList); //批量插入
+eg:
+
+---------delete相关---------
+
+boolean deleteById(I id); //通过ID删除
+eg:userMapper.deleteById(id);
+
+boolean deleteByMap(Map<String, Object> columnMap); // 通过自定义MAP删除
+eg:Map map = new HashMap();
+        map.put("username", username);  //设置参数，key是数据库表字段
+        return userMapper.deleteByMap(map);
+
+boolean deleteSelective(T entity); //通过entity实体选择性删除，null字段不作为条件
+eg:
+
+boolean deleteBatchIds(List<I> idList); //批量删除
+eg:List idList = new ArrayList(Arrays.asList(ids));
+        return userMapper.deleteBatchIds(idList);
+
+---------update相关---------
+
+boolean updateById(T entity); //通过实体的ID更新，
+eg:  return userMapper.updateById(user);
+
+boolean updateSelectiveById(T entity); //通过ID选择性更新，null字段不更新
+eg:
+
+boolean update(T entity, Wrapper<T> updateWrapper); //通过whereEntity实体构造where条件进行更新
+eg:
+
+boolean updateSelective(T entity, T whereEntity); //通过whereEntity实体构造where条件进行选择性更新
+eg:
+
+boolean updateBatchByIds(List<T> entityList); //批量更新
+eg:  
+
+---------select相关---------
+
+T selectById(I id); //通过ID查询
+eg:userMapper.selectById(id);
+
+List<T> selectBatchIds(List<I> idList); //通过ID集合批量查询
+eg:   List idList = new ArrayList(Arrays.asList(ids));
+        return userMapper.selectBatchIds(idList);
+
+List<T> selectByMap(Map<String, Object> columnMap); //通过自定义MAP查询
+eg:Map map = new HashMap();
+        map.put("username", username);  //key是数据库表的字段
+//        map.put("sex", sex);
+        //使用mybatis-plus自带的方法，返回值是list
+        return userMapper.selectByMap(map);
+
+List<T> selectMaps( Wrapper<T> queryWrapper); //通过自定义多个MAP查询
+eg：//经常查询条件包装
+        QueryWrapper queryWrapper = new QueryWrapper<>();
+        queryWrapper.like("username", username);
+        queryWrapper.eq("sex", sex);
+        queryWrapper.gt(true, "age", age);
+        return userMapper.selectMaps(queryWrapper);
+
+T selectOne(Wrapper<T> queryWrapper); //通过实体entity查询
+eg://创建条件构造器
+QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("nickname","sunshine");
+        Useruser= UserMapper.selectOne(userQueryWrapper );
+
+int selectCount(Wrapper<T> queryWrapper); //统计查询
+eg:  QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.gt(true,"age", age);  //表示大于(不包含边界)
+        return userMapper.selectCount(userQueryWrapper);
+
+List<T> selectList(Wrapper<T> entityWrapper); //List查询，entityWrapper为查询条件构造器
+eg:   QueryWrapper queryWrapper = new QueryWrapper();
+//        queryWrapper.eq("username1", "li");  //设置条件，含有li的
+        return userMapper.selectList(null);  //无条件
+//        return userMapper.selectList(queryWrapper);   //有条件
+
+IPage<T> selectPage(Page<T> page, Wrapper<T> entityWrapper); //分页查询，page为分页实体，entityWrapper为查询条件构造器
+eg: adminDAO.selectPage(new Page<>(1, 3), null);
+
+// 分页查询 10 条姓名为‘张三’的用户记录
+ List<User> userList = userMapper.selectPage( new Page<User>(1, 10), new EntityWrapper<User>().eq("name", "张三") );
+
+【
+// 分页查询 10 条姓名为‘张三’、性别为男，且年龄在18至50之间的用户记录
+List<User> userList = userMapper.selectPage(
+        new Page<User>(1, 10),
+        new QueryWrapper<User>().eq("name", "张三")
+                .eq("sex", 0)
+                .between("age", "18", "50")
+);
+等价于
+SELECT *
+FROM sys_user
+WHERE (name='张三' AND sex=0 AND age BETWEEN '18' AND '50') .eq等同于where条件
+LIMIT 0,10
+】
+new Query<>(params) params(1，5) 第2页，五行记录  limit 0,5
+
+
+
+ umsMemberMapper.update(umr, new QueryWrapper<UmsMember>().eq("mobile", mobile)); 将手机号=mobile的数据库内容修改为umr里的实体（将umr放到数据库）
+
+
+-----------------条件构造器(QueryWrapper)---------------------
+查询方式	              说明
+setSqlSelect       设置 SELECT 查询字段
+where	      WHERE 语句，拼接 + WHERE 条件
+and	        AND 语句，拼接 + AND 字段=值
+andNew	     AND 语句，拼接 + AND (字段=值)
+or	    OR 语句，拼接 + OR 字段=值
+orNew	    OR 语句，拼接 + OR (字段=值)
+eq	    等于=
+allEq	  基于 map 内容等于=
+ne	   不等于<>
+gt	  大于>
+ge	   大于等于>=
+lt	  小于<
+le	  小于等于<=
+like	  模糊查询 LIKE
+notLike	  模糊查询 NOT LIKE
+in	   IN 查询
+notIn	   NOT IN 查询
+isNull	     NULL 值查询
+isNotNull	    IS NOT NULL
+groupBy	    分组 GROUP BY
+having	   HAVING 关键词
+orderBy	    排序 ORDER BY
+orderAsc	    ASC 排序 ORDER BY
+orderDesc      DESC 排序 ORDER BY
+exists	   EXISTS 条件语句
+notExists	    NOT EXISTS 条件语句
+between	     BETWEEN 条件语句
+notBetween	NOT BETWEEN 条件语句
+addFilter	    自由拼接 SQL
+last	  拼接在最后，例如：last("LIMIT 1")
+
+【说明：messageQueryWrapper.eq(“nickname”,“sunshine”);
+其中，第一个参数为数据库中的字段名称，记住，是数据库中的字段
+第二个参数为要查询的内容】

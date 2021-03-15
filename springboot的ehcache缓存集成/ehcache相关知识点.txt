@@ -1,0 +1,104 @@
+一、cache 各个属性说明：
+--属性--	                                --属性说明--
+(1)name	                缓存名称
+(2)maxElementsInMemory	内存中最大缓存对象数
+(3)eternal	对象是否永久有效，一但设置true了，timeout将不起作用，true表示对象永不过期，此时会忽略timeToIdleSeconds和timeToLiveSeconds属性，默认为false
+(4)timeToIdleSeconds         设置对象在失效前的允许闲置时间，即允许对象处于空闲状态的最长时间（单位：秒）。仅当eternal=false对象不是永久有效时使用，可选属性，默认值是0，也就是可闲置时间无穷大。当对象自从最近一次被访问后，如果处于空闲状态的时间超过了timeToIdleSeconds属性值，这个对象就会过期，EHCache将把它从缓存中清空。只有当eternal属性为false，该属性才有效。如果该属性值为0，则表示对象可以无限期地处于空闲状态
+(5)timeToLiveSeconds	设置对象在失效前允许存活时间，即允许对象存在于缓存中的最长时间（单位：秒）。最大时间介于创建时间和失效时间之间。仅当eternal=false对象不是永久有效时使用，默认是0，也就是对象存活时间无穷大。当对象自从被存放到缓存中后，如果处于缓存中的时间超过了 timeToLiveSeconds属性值，这个对象就会过期，EHCache将把它从缓存中清除。只有当eternal属性为false，该属性才有效。如果该属性值为0，则表示对象可以无限期地存在于缓存中。timeToLiveSeconds必须大于timeToIdleSeconds属性，才有意义
+(6)overflowToDisk	     当内存中对象数量达到maxElementsInMemory时，Ehcache将会对象写到磁盘中,true表示当内存缓存的对象数目达到了maxElementsInMemory界限后，会把溢出的对象写到硬盘缓存中。注意：如果缓存的对象要写入到硬盘中的话，则该对象必须实现了Serializable接口才行。
+(7)diskSpoolBufferSizeMB	这个参数设置DiskStore（磁盘缓存）的缓存区大小。默认是30MB。每个Cache都应该有自己的一个缓冲区
+(8)maxElementsOnDisk	硬盘中最大缓存对象数，若是0表示无穷大
+(9)diskPersistent	  是否缓存虚拟机重启期数，默认false
+(10)diskExpiryThreadIntervalSeconds             磁盘失效线程运行时间间隔，默认是120秒
+(11)memoryStoreEvictionPolicy         当达到maxElementsInMemory限制时，Ehcache将会根据指定的策略去清理内存。默认策略是LRU（最近最少使用）。可设置为FIFO（先进先出）或LFU（较少使用）
+(12)clearOnFlush	    内存数量最大时是否清除
+
+二、ehcache.xml缓存配置文件(通用)
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd" updateCheck="true"
+         monitoring="autodetect" dynamicConfig="true" maxBytesLocalHeap="500M">
+
+    <!--cache属性说明：
+           name：缓存名称
+           maxElementsInMemory：内存中最大缓存对象数
+           maxElementsOnDisk：硬盘中最大缓存对象数，若是0表示无穷大
+           eternal：true表示对象永不过期，此时会忽略timeToIdleSeconds和timeToLiveSeconds属性，默认为false
+           overflowToDisk：true表示当内存缓存的对象数目达到了maxElementsInMemory界限后，会把溢出的对象写到硬盘缓存中。注意：如果缓存的对象要写入到硬盘中的话，则该对象必须实现了Serializable接口才行。
+           diskSpoolBufferSizeMB：磁盘缓存区大小，默认为30MB。每个Cache都应该有自己的一个缓存区。
+           diskPersistent：是否缓存虚拟机重启期数据
+           diskExpiryThreadIntervalSeconds：磁盘失效线程运行时间间隔，默认为120秒
+           timeToIdleSeconds： 设定允许对象处于空闲状态的最长时间，以秒为单位。当对象自从最近一次被访问后，如果处于空闲状态的时间超过了timeToIdleSeconds属性值，这个对象就会过期，EHCache将把它从缓存中清空。只有当eternal属性为false，该属性才有效。如果该属性值为0，则表示对象可以无限期地处于空闲状态
+           timeToLiveSeconds：设定对象允许存在于缓存中的最长时间，以秒为单位。当对象自从被存放到缓存中后，如果处于缓存中的时间超过了 timeToLiveSeconds属性值，这个对象就会过期，EHCache将把它从缓存中清除。只有当eternal属性为false，该属性才有效。如果该属性值为0，则表示对象可以无限期地存在于缓存中。timeToLiveSeconds必须大于timeToIdleSeconds属性，才有意义
+           memoryStoreEvictionPolicy：当达到maxElementsInMemory限制时，Ehcache将会根据指定的策略去清理内存。可选策略有：LRU（最近最少使用，默认策略）、FIFO（先进先出）、LFU（最少访问次数）。
+           clearOnFlush：内存数量最大时是否清除。
+    -->
+
+    <!--磁盘缓存-->
+    <diskStore path="java.io.tmpdir"/>
+
+    <!--默认缓存策略配置。 这些设置将应用于缓存使用CacheManager以编程方式创建。添加(字符串cacheName) -->
+    <defaultCache
+            maxElementsInMemory="10000"
+            eternal="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            maxElementsOnDisk="10000000"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LRU">
+        <persistence strategy="localTempSwap"/>
+    </defaultCache>
+
+    <!-- 自定义缓存策略。 注意：定义多个自定义缓存策略，他们的name值不一样  在application.properties中配置该文件位置-->
+    <cache name="myCache">   <!-- name：自定义缓存策略名   在方法上使用@Cacheable(value = "myCache") -->
+        maxElementsInMemory="10000"
+        eternal="false"
+        timeToIdleSeconds="120"
+        timeToLiveSeconds="120"
+        maxElementsOnDisk="10000000"
+        diskExpiryThreadIntervalSeconds="120"
+        overflowToDisk="false"
+        memoryStoreEvictionPolicy="LRU">
+        <persistence strategy="localTempSwap"/>
+    </cache>
+
+</ehcache>
+
+
+三、配置ehcache.xml时报错不能加载 'ehcache.xsd'，http://ehcache.org/ehcache.xsd显示红色
+解决方法:
+打开settings->languages&frameworks->schemas and dtds ,添加地址 http://ehcache.org/ehcache.xsd
+（参考教程：https://blog.csdn.net/weixin_41045798/article/details/80201783?utm_medium=distribute.pc_relevant.none-task-blog-title-2&spm=1001.2101.3001.4242    或    https://blog.csdn.net/qq_45738810/article/details/107908914?utm_medium=distribute.pc_relevant.none-task-blog-title-6&spm=1001.2101.3001.4242）
+
+
+四、ehcache缓存注解的说明和使用(@Cacheable与@CacheEvict，用在serviceImpl层)
+（1）@Cacheable
+作用：把方法返回值添加到Ehcache的缓存对象中做缓存
+value属性：指定一个Ehcache配置文件中的缓存策略(缓存策略简称缓存，缓存中可以有多个缓存对象)，即.xml文件中name属性的值，如果没有给定value，name则表示使用默认的缓存机制。
+key属性：给存储的值起个名称()缓存对象，即key(默认为key="#参数名")。 在查询时如果有名称相同的key，那么直接从缓存中将数据返回。
+（2）@CacheEvict
+作用：清空缓存，以达到缓存同步效果。
+value属性：清除指定的缓存策略(缓存策略简称缓存)；
+key属性：给存储的值起个名称()，即缓存对象，即key(默认为key="#参数名")。 在查询时如果有名称相同的key，那么直接把该缓存删除。(如果不指定key具体的缓存对象，则默认清除缓存中所有的缓存对象)
+allEntries属性: 默认false
+（注意：该注解在对数据看库进行更新方法上使用，使缓存失效，重新从数据中进行查询并将新的结果缓存到Ehcache中，达到缓存同步效果)
+
+
+五、总结
+（1）Springboot整合Encache实现数据缓存时，可以通过注入 CacheManager 实现缓存内容的查询和缓存清空；
+（2）可以使用 @Cacheable 和 @CacheEvict 实现缓存和缓存清空；
+（3）清空缓存(清除缓存中的所有缓存对象)有两种方式：方式一通过使用 cache.clear();，方式二使用 @CacheEvict 注解在调用指定方法(一般是增删改方法)时清空缓存(不指定key具体对象，则默认清空缓存中所有的缓存对象)。
+（4）注意：只有检测到业务逻辑方法上的缓存中是存在目标缓存对象的，就一定不会执行该方法，即不会访问数据库；相反如果检测到缓存中是不存在目标缓存对象的，就会执行该方法，访问数据库获取数据，最后并把返回的数据值存储到目标缓存对象中，供以后直接使用。
+
+
+六、原理过程分析说明：（ 以ehcache-demo1项目里的 findAllUser(User user1) 接口方法为例 ）
+（1）在配置有上述 application.properties ehcache.xml 等配置文件的 SpringBoot 项目中，且配置有 spring.jpa.show-sql = true 的前提下，再综合 Dao 、Service 和 Controller，通过对控制台打印的信息进行分析
+（2）在第一次查询时，在执行业务逻辑层findAllUser()方法前，先判断方法( @Cacheable)的缓存策略中的某个缓存对象key是否存在，发现缓存策略中没有该缓存对象的值，于是就执行该方法， Users 的信息是从数据库中查询得到的，因为打印了 Hibernate: select users0_.id as id1_0_, users0_.name as name2_0_ from t_user users0_，最后把数据库返回的数据结果值存储到缓存对象中，再把结果返回给上一层。
+（3）在第二次查询时，再去执行findAllUser()方法，在执行业务逻辑层findAllUser()方法前，先判断方法( @Cacheable)的缓存方法空，发现缓存策略中存在该缓存对象，即有值(第一次查询存储的)，于是就不执行该方法，我们只能在缓存中获取缓存对象值，所以方法没有打印 Hibernate sql 语句，紧接着第一次从缓存中取值是有值的，所以说明第二次查询是从缓存中取的，并且缓存中有所有Users 的值 ；
+（4）回到 Controller 中，在第一次从缓存中取值后面，即在第二次从缓存中取值前，有清除缓存的代码 cache.clear(); ，说明代码 cache.clear(); 生效，缓存策略中的所有缓存对象被清除掉了。这个可通过第三次查询得知，因为第三次查询打印了 Hibernate sql 语句，这就更加证实了 cache.clear(); 生效了；所以第二次从缓存中取值时是取不到值的，因为缓存对象被清除了，不存在值了；然后接着当第三次查询时，在执行业务逻辑层findAllUser()方法前，先判断方法( @Cacheable)的缓存策略中的某个缓存对象key是否存在，发现缓存策略中没有该缓存对象的值，于是就执行该方法， Users 的信息是从数据库中查询得到的，打印了 Hibernate: select users0_.id as id1_0_, users0_.name as name2_0_ from t_user users0_，最后把数据库返回的数据结果值存储到缓存对象中，再把结果返回给上一层；
+（5）第三次从缓存中取值，此时缓存策略中是存在该缓存对象的，即有值(第三次查询存储的)，是不会执行业务逻辑层findAllUser()方法和访数据库的，只能从缓存中获取数据，和第一次从缓存中取的值一致。
+（6）注意：一般要在对数据看库进行更新(增、删、改)方法上使用，使缓存失效，重新从数据中进行查询并将新的结果缓存到Ehcache缓存对象中，达到缓存同步效果。因此在更新(增、删、改)方法上使用 @CacheEvict 注解也可清空缓存。
+（7）综上所述，在SpringBoot 中整合Encache实现了数据的缓存。
+（注意：只有检测到业务逻辑方法上的缓存中是存在目标缓存对象的，就一定不会执行该方法，即不会访问数据库；相反如果检测到缓存中是不存在目标缓存对象的，就会执行该方法，访问数据库获取数据，最后并把返回的数据值存储到目标缓存对象中，供以后直接使用）
+
+

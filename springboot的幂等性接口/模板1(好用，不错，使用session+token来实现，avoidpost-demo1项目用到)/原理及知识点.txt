@@ -1,0 +1,21 @@
+一、概念
+幂等性, 通俗的说就是一个接口, 多次发起同一个请求, 必须保证操作只能执行一次 比如:
+订单接口, 不能多次创建订单
+支付接口, 重复支付同一笔订单只能扣一次钱
+支付宝回调接口, 可能会多次回调, 必须处理重复回调
+普通表单提交接口, 因为网络超时等原因多次点击提交, 只能成功一次 等等
+
+二、实现思路
+为保证幂等性，每一次请求（创建订单）接口都生成一个新的唯一标识 token, 并将此 token存入session, 同时返回token给其前端，下次请求（下单）接口时, 将此 token放到header或者作为请求参数带过来, 后端（下单）接口判断当前session中的token与前端传递过来的token是否相等:
+
+当前session中是否存在此token；
+前端请求或参数中是否携带有token
+
+如果都存在, 并且相等，正常处理业务逻辑, 并从session中删除此 token, 那么, 如果是重复请求, 由于 token已被删除, 则不能通过校验, 返回 请勿重复操作提示；
+如果不存在, 说明参数不合法或者是重复请求, 返回提示即可
+
+集群环境：采用token加redis（redis单线程）
+单JVM环境：采用token加redis或token加jvm内存
+
+
+（参考教程：https://blog.csdn.net/weixin_42030357/article/details/107412697?utm_medium=distribute.wap_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2.wap_blog_relevant_pic&depth_1-utm_source=distribute.wap_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2.wap_blog_relevant_pic）

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mzl.zfbpaydemo2.dao.OrderInfoDao">
+
+    <!--保存到数据库-->
+    <insert id="insert">
+        insert into order_info
+        values(#{orderId}, #{subject}, #{body}, #{money}, #{sellerId}, null, #{status}, 0, #{createDate}, #{updateDate})
+    </insert>
+
+    <!--更新订单状态-->
+    <update id="updateById">
+        update order_info
+        <set>
+            <if test="alipayNo != null and alipayNo != ''">
+                alipay_no = #{alipayNo},
+            </if>
+            <if test="status != null and status != ''">
+                status = #{status},
+            </if>
+        </set>
+        where order_id = #{orderId}
+    </update>
+
+
+</mapper>

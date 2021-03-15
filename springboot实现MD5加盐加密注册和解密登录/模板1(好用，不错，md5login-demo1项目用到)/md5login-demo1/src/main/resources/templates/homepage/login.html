@@ -1,0 +1,120 @@
+﻿<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="front::head('登录')"></head>
+<body>
+<div id="app">
+
+    <div class="page-cont-wrap">
+        <div class="container">
+            <div class="row">
+                <!--start form content-->
+                <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
+                    <div class="form-cont">
+                        <h3>登录</h3>
+                            <div class="form-group">
+                                <input v-model="userName" type="text" class="form-control"
+                                       placeholder="请输入用户名" required="required">
+                            </div>
+                            <div class="form-group">
+                                <input v-model="password" type="password" class="form-control"
+                                       placeholder="请输入密码" required="required">
+                            </div>
+                            <button @click="login">登录</button>
+
+                    </div>
+
+                </div>
+                <!--end form content-->
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .page-cont-wrap {
+        padding: 164px 0;
+    }
+
+    .form-cont {
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+    }
+
+    .form-cont button {
+        width: 100%;
+        padding: 14px 0;
+        font-size: 15px;
+        font-weight: 500;
+        text-transform: uppercase;
+        background-color: #409EFF;
+        color: #fff;
+        border: 0;
+        border-radius: 4px;
+        margin: 15px 0 0;
+    }
+
+    .offset-lg-3 {
+        margin-left: 25%;
+    }
+
+    .form-cont h3 {
+        font-weight: 600;
+        text-align: center;
+        margin: 0 0 30px;
+    }
+
+</style>
+<div th:replace="front::scripts"></div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            activeIndex: '10',
+            userName:"",
+            password:"",
+        },
+        methods:{
+            login:function () {
+                axios({
+                    url:'/sp/user/loginUser',
+                    method:'post',
+                    data:{
+                        userName:this.userName,
+                        password:this.password
+                    },
+                    headers:{
+                        "Content-Type": "application/json"
+                    }
+                }).then(function(res){
+                    console.log(res.data)
+                    if(res.data.flag){
+                        window.location.href = "/index";
+                    }else{
+                        var message = res.data.message;
+                        $("#alertMessage").text(message)
+                        $('#alertModel').modal('show')
+                    }
+
+                });
+            }
+        }
+    })
+    $(document).ready(function () {
+        //按enter键触发登录点击事件
+
+        $("body").keydown(function () {
+            if (event.keyCode == "13") {//keyCode=13是回车键
+                $('.m-b').click();
+            }
+        })
+
+        //点击忘记密码弹框
+        $(".forgetPassword").click(function () {
+            alert("请联系管理员")
+        })
+
+    });
+</script>
+</body>
+</html>
+

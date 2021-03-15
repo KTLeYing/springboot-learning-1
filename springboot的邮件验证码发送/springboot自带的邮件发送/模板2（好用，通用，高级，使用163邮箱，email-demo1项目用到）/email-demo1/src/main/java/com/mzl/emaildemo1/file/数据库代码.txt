@@ -1,0 +1,612 @@
+
+--p55
+--1.
+create database MYDB
+on
+(name=mydb,
+filename='d:\MYDB\mydb.mdf',
+size=10mb,
+maxsize=unlimited,
+filegrowth=10%)
+log on
+(name=mydb_log,
+filename='d:\MYDB\mydb_log.ldf',
+size=2mb,
+maxsize=100mb,
+filegrowth=10mb)
+--2.
+USE MYDB
+GO
+create table stu
+(
+sno char(10) primary key,
+name varchar(10) not null,
+sex char(1) check(sex in ('0','1')),
+bdate datetime,
+dept varchar(10),
+dormitory varchar(10)
+)
+--P59
+--3.
+insert into score(sno,cno)
+select '2015874133',cno from course
+--4.
+update score
+set grade=60
+where sno='2015874133'
+--P79
+--(1)
+select sno,grade
+from score
+where cno='c06'
+--(2)
+select s.sno,sname
+from student s,score sc
+where s.sno=sc.sno and cno='c06'
+--(3)
+select s.sno,sname
+from student s,score sc,course c
+where s.sno=sc.sno and c.cno=sc.cno
+and cname='ENGLISH'
+--(4)
+select sno
+from score
+where cno='c02' or cno ='c06'
+--(5)
+select x.sno
+from score x,score y
+where x.sno=y.sno and x.cno='c02' and y.cno='c06'
+--(6)
+select sname, substring(sno,8,1)
+from student
+where sno not in (select sno
+                  from score
+				  where cno='c06')
+--(7)
+select sname
+from student s
+where not exists
+    (select *
+	from course c
+	where not exists
+	    (select *
+		from score sc
+		where s.sno=sc.sno and c.cno=sc.cno))
+--(8)
+select sno 
+from score
+where cno in
+      (select cno
+       from score
+       where sno='s08') and sno<>'s08'
+--��3�¿κ�ϰ��
+--p85T3.5
+--��1��
+select *
+from score
+where cno in ('01','02','03')
+--(2)
+select *
+from score
+where cno not in ('01','02','03')
+and grade>60
+--(3)
+select *
+from score
+where cno in ('01','02','03')
+and grade between 70 and 80
+--(4)
+select MAX(grade),MIN(grade),AVG(grade)
+from score
+where cno='01'
+--(5)
+select COUNT(sno)
+from student
+where sno like'2014___1%' 
+and gender='��'
+--(6)
+select COUNT(sno)
+from student
+where sno like'2014___1%' and 
+sname like '��%'
+--(7)
+select sno,sname
+from student
+where sno like'2014___1%' and 
+sname like '��%'
+--(8)
+select *
+from teacher
+where age<YEAR(getdate())-1980
+--(9)
+select COUNT(cno)
+from course
+where tno='0001'
+--(10)
+select *
+from course
+where tno is null
+--T3.6
+--(2)
+select sno,COUNT(cno)
+from score
+group by sno
+having COUNT(cno)>=3
+--(3)
+select sno,COUNT(cno)
+from score
+where sno in ('101','102','103')
+and grade<60
+group by sno
+--(4)
+select s.sno,sname,cname,grade,tname
+from student s,course c,score sc,teacher t
+where s.sno=sc.sno and c.cno=sc.cno
+and c.tno=t.tno
+order by s.sno
+--(5)
+select x.cno,x.cname,y.precno,z.cname
+from course x,course y,course z
+where x.precno=y.cno and
+x.cname='���ݿ�γ����' and
+y.precno=z.cno
+--(6)
+select *
+from student left join score
+on student.sno=score.sno
+--T3.7
+--(1)
+select sno,MAX(grade),MIN(grade),AVG(grade)
+from score
+group by sno
+--(2)
+select sno
+from score
+group by sno
+having MAX(grade)<90 and MIN(grade)>70
+--(3)
+select s.sno,sname,MAX(grade),MIN(grade),AVG(grade)
+from student s,score sc
+where s.sno=sc.sno
+group by s.sno,sname
+--(4)
+select sno,sname,class
+from student
+where sno in 
+      (select sno
+      from score
+      group by sno
+      having MAX(grade)<90 and MIN(grade)>70)
+--(5)
+select sno
+from score
+where cno='203' and grade>(select grade
+                           from score
+                           where sno='103' and 
+                           cno='203')
+--(6) 
+select s.sno,sname
+from score sc,student s
+where sc.sno=s.sno and cno='203'
+and grade>(select grade
+           from score
+           where sno='103' and 
+                cno='203') 
+--(7)
+select *
+from student
+where age=(
+        select age
+        from student
+        where sname='����')
+--(8)
+select x.sname
+from student x,student y
+where x.class=y.class and y.sname='����'
+and x.age=y.age
+--(9)
+select sno,grade
+from score,(select cno,AVG(grade) av from score group by cno) a
+where score.cno=a.cno and grade<av
+--T3.8
+--(1)
+select ename
+from emp
+where eid in (select eid
+              from works
+              where cid in 
+                   (select cid
+                   from comp
+                   where cname='IBM��˾'))
+--(2)
+select ename,cname
+from emp,comp,works
+where emp.eid=works.eid
+and comp.cid=works.cid
+and YEAR(getdate())-bdate>50
+and sex='Ů'
+--(3)
+select *
+from emp,comp,works
+where emp.eid=works.eid
+and comp.cid=works.cid
+and emp.city=comp.city
+--(4)
+select COUNT(distinct eid) e#,AVG(salary) avg_sal,
+MAX(salary) max_sal,MIN(salary) min_sal
+from comp,works
+where comp.cid=works.cid and cname='IBM��˾'
+--(5)
+select sname
+from emp
+where sno in
+    (select sno
+    from works x,works y 
+    where x.eid=y.eid and x.cid=(select cid
+                                 from comp
+                                 where cname='IBM��˾')
+         and y.cid= (select cid
+                     from comp
+                     where cname='SAP��˾') )    
+--(6)
+select eid
+from works,(select cid,AVG(salary) av_sal from works group by cid) a
+where works.cid=a.cid and salary>av_sal
+--(7)
+select cid
+from works
+group by cid
+having COUNT(sno)>=all(select COUNT(sno)
+                       from works
+                       group by cid)
+--(8)        
+update works
+set salary=salary*(1+10%)
+where YEAR(getdate())-YEAR(startdate)>10
+--(9)
+delete
+from emp
+where YEAR(getdate())-YEAR(bdate)>60 
+--(10)
+insert into emp
+values('e11','����','1990-03-01','��','����') 
+insert into works(eid,cid,startdate)
+values('e11','c01','2018-01-01') 
+--T3.9
+create view v1
+as
+select *
+from emp,comp,works
+where emp.eid=works.eid and comp.cid=works.cid
+and cname= 'IBM��˾'  
+with check option
+--T3.10
+select cid,COUNT(eid) cn_eid,AVG(salary) av_sal
+into comp_info
+from works
+--��4�¿�����ϰ
+--p96
+--1.
+declare @s int,@i int
+select @s=0,@i=1
+while @i<=100
+begin
+set @s=@s+@i
+set @i=@i+1
+end
+print '1~100�ĺ��ǣ�'+cast(@s as char(10))
+--2.
+create function isPrime(@n int)
+returns int
+as
+begin
+ declare   @i int
+ set @i=2
+ while @i<=cast(sqrt(@n) as int)
+    begin
+        if(@n%@i=0) return 0
+		set @i=@i+1
+    end
+    return 1
+end 
+
+ declare @n int
+ set @n=2
+ while @n<=100
+ begin
+ if(dbo.isPrime(@n)=1) 
+ print @n
+ set @n=@n+1
+ end
+--3.
+select sno,sname,gender,age,
+case depart
+when '001' then '��Ϣ����ѧԺ'
+when '002' then '��ѧԺ'
+when '003' then '���繤��ѧԺ'
+when '004' then '������ѧ�뼼��ѧԺ'
+end as depart,specialty
+from student
+--4.
+declare @xszs int,@xkrs int
+select @xszs=count(*) from student
+select @xkrs=count(distinct sno) from score
+if @xkrs>@xszs/2
+ select cno,count(sno)
+ from score
+ group by cno
+else
+ print 'ѡ����������ѧ��������һ��'
+--P104
+--1.
+create function f_Factorial(@n int)
+returns bigint
+as
+begin
+declare @s bigint,@i int
+select @s=1,@i=1
+while @i<=n
+begin
+set @s=@s*@i
+set @i=@i+1
+end
+return @s
+end
+--2.
+create function f_avgGrade(@cname char(30))
+returns int
+as
+begin
+declare @av int
+select @av=avg(grade)
+from score,course
+where score.cno=course.cno
+and cname=@cname
+return @av
+end
+--3.
+create function f_GradePoint(@sname char(20),@cname char(20))
+returns decimal(5,1)
+as
+begin
+declare @jd decimal(5,1)
+select @jd=
+case 
+when grade<60 then 0
+when grade<70 then 1.0
+when grade<80 then 2.0
+when grade<90 then 3.0
+when grade<100 then 4.0
+else 5.0
+end 
+from student s,course c,score sc
+where s.sno=sc.sno and c.cno=sc.cno
+and cname=@cname and sname=@sname
+return @jd
+end
+--P112
+--1.
+create procedure P_EX_1
+@sno char(20)
+as
+begin
+delete from score
+where sno=@sno
+delete from student
+where sno=@sno
+end
+--2.
+create procedure P_EX_2
+@cname char(20)
+as
+update score
+set grade=0
+where cno in (select cno from course where cname=@cname)
+--3.
+create procedure P_CE_3
+@tname char(20),@delete_cn int output
+as
+begin
+delete
+from score
+where cno in 
+      (select cno 
+       from course
+       where tno in 
+			(select tno 
+		     from teacher 
+		     where tname=@tname)
+set @delete_cn=@@rowcount
+end
+--4.
+create procedure P_CE_4
+@tname char(20),@update_cn int output
+as
+begin
+update score
+set grade=0
+where where cno in 
+      (select cno 
+       from course
+       where tno in 
+			(select tno 
+		     from teacher 
+		     where tname=@tname) and grade<60
+set @update_cn=@@rowcount
+end
+--5.
+create procedure P_CE_5
+@sno char(10),@cno char(10),@grade int
+as
+begin
+if exists(select * from score where sno=@sno and cno=@cno)
+begin
+update score
+set grade=@grade
+where sno=@sno and cno=@cno
+return 1
+else
+begin
+insert into score
+values(@sno,@cno,@grade)
+return -1
+end
+end
+--P119
+--1.
+create trigger t1
+on student
+after delete
+as
+delete from score
+where sno in (select sno from deleted)
+--2.
+create trigger t2
+on teacher
+after delete
+as
+begin
+if exists(select * from course where tno in 
+(select tno from deleted))
+ update course
+ set tno=NULL
+ where tno in 
+(select tno from deleted)
+if exists(select * from department where
+tno in (select tno from deleted))
+update department
+ set tno=NULL
+ where tno in 
+(select tno from deleted)
+end
+--P129
+--1.
+declare @sname char(20),@cname char(20),@grade int,
+@jd decimal(5,1),@av_jd decimal(5,1),@cn int
+set @sname='�ν��'
+set @av_jd=0
+declare c1 cursor
+for select cname,grade
+from student s,score sc,course c
+where s.sno=sc.sno and c.cno=sc.cno
+and sname=@sname
+open c1
+select @cn=count(*)
+from student s,score sc,course c
+where s.sno=sc.sno and c.cno=sc.cno
+and sname=@sname
+print rtrim(@sname)+'ͬѧ�ĳɼ���'
+print '�γ�����            �ɼ�     ����'
+print '---------------------------------'
+fetch next from c1 into @cname,@grade
+select @jd=dbo.f_GradePoint(@sname,@cname)
+set @av_jd=@av_jd+@jd
+while @@FETCH_STATUS=0
+begin
+print @cname+cast(@grade as char(10))+cast(@jd as char(10))
+fetch next from c1 into @cname,@grade
+select @jd=dbo.f_GradePoint(@sname,@cname)
+set @av_jd=@av_jd+@jd
+end
+set @av_jd=@av_jd/@cn
+print '---------------------------------'
+print 'ƽ�����㣺'+cast(@av_jd as char(10))
+close c1
+deallocate c1
+--2.
+declare @grade int
+declare c1 cursor 
+for select grade from score
+for update
+open c1
+fetch next from c1 into @grade
+while @@FETCH_STATUS=0
+begin
+if @grade>=75
+  update score
+  set grade=grade+5
+  where current of c1
+else
+  delete
+  from score
+  where current of c1
+  fetch next from c1 into @grade
+end
+close c1
+deallocate c1
+--��4�¿κ�ϰ��
+--p133T4.9
+create procedure p1
+@xh char(10),@zgf int output,@zdf int output
+as
+select @zgf=max(grade),@zdf=min(grade)
+from score
+where sno=@xh
+--T4.10
+create procedure p2
+@cno char(5)=NULL
+AS
+if @cno is null
+begin
+ select student.sno,sname,grade
+ from student,score
+ where student.sno=score.sno
+ end
+else
+begin
+ select student.sno,sname,grade
+ from student,score
+ where student.sno=score.sno
+ and score.cno=@cno
+ end
+--T4.11
+create trigger t1
+on score
+after insert
+as
+if (select status from course,inserted
+    where course.cno=inserted.cno)='1'
+	begin
+	 print '�ÿγ�����׼����'
+	 print '�ô�ѡ�β���ʧ��'
+	 rollback transcation
+	end
+--T4.12
+create trigger t2
+on score
+after insert
+as
+if(select count(*) from course,inserted 
+where course.cno=inserted.cno)<>@@rowcount
+begin
+ delete from score
+ where cno not in (select cno from course)
+end
+--T4.13
+declare c1 cursor
+for select * from student
+open c1
+fetch next from c1
+while @@FETCH_STATUS=0
+ fetch next from c1
+close c1
+deallocate c1
+--T4.14
+declare @age int
+declare c2 cursor
+for select age from student
+for update of age
+open c2
+fetch next from c2 into @age
+while @@FETCH_STATUS=0
+begin
+if @age>20
+ update student
+ set age=20
+ where current of c2
+ fetch next from c2 into @age
+ end
+ close c2
+deallocate c2
+
+                

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>用户信息页面</title>
+    <script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <input type="hidden" name="id" th:value="${user.id}" id="id" readonly="readonly">
+    <div>
+        <label>用户名：</label>
+        <input type="text" name="username" th:value="${user.username}" id="username" readonly="readonly">
+    </div>
+    <div>
+        <label>头像：</label><br>
+        <img th:src="@{/viewImage(path=${user.imagePath})}" style="border-radius: 50%" width="200" height="200">
+    </div>
+    <input type="button" onclick="toAlterInfo()" value="修改"/>
+</body>
+<script type="text/javascript">
+    function toAlterInfo() {
+        var id = $("#id").val();
+        window.location.href="toAlterInfo?id=" + id;
+    }
+</script>
+</html>

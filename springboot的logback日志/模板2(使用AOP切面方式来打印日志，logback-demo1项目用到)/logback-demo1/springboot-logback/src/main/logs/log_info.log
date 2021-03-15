@@ -1,0 +1,31 @@
+2020-11-11 18:14:25.812 [restartedMain] INFO  com.mzl.logbackdemo1.LogbackDemo1Application - Starting LogbackDemo1Application on LAPTOP-FK4AGT9C with PID 7744 (D:\IDEA\Idea-workplace\logback-demo1\target\classes started by 21989 in D:\IDEA\Idea-workplace\logback-demo1)
+2020-11-11 18:14:25.819 [restartedMain] INFO  com.mzl.logbackdemo1.LogbackDemo1Application - No active profile set, falling back to default profiles: default
+2020-11-11 18:14:25.971 [restartedMain] INFO  o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2020-11-11 18:14:25.972 [restartedMain] INFO  o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2020-11-11 18:14:30.263 [restartedMain] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http)
+2020-11-11 18:14:30.280 [restartedMain] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2020-11-11 18:14:30.281 [restartedMain] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2020-11-11 18:14:30.282 [restartedMain] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.39]
+2020-11-11 18:14:30.445 [restartedMain] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2020-11-11 18:14:30.445 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 4471 ms
+2020-11-11 18:14:31.165 [restartedMain] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'applicationTaskExecutor'
+2020-11-11 18:14:31.532 [restartedMain] INFO  o.s.b.d.autoconfigure.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2020-11-11 18:14:31.556 [restartedMain] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2020-11-11 18:14:31.588 [restartedMain] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (http) with context path ''
+2020-11-11 18:14:31.604 [restartedMain] INFO  com.mzl.logbackdemo1.LogbackDemo1Application - Started LogbackDemo1Application in 7.253 seconds (JVM running for 12.333)
+2020-11-11 18:15:54.236 [http-nio-8080-exec-1] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2020-11-11 18:15:54.236 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2020-11-11 18:15:54.254 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 17 ms
+2020-11-11 18:15:54.398 [http-nio-8080-exec-1] INFO  com.mzl.logbackdemo1.aop.LogAop - 请求开始时间：2020-11-11T18:15:54.398
+2020-11-11 18:15:54.432 [http-nio-8080-exec-1] INFO  com.mzl.logbackdemo1.aop.LogAop - 请求Url : http://localhost:8080/test
+2020-11-11 18:15:54.433 [http-nio-8080-exec-1] INFO  com.mzl.logbackdemo1.aop.LogAop - 请求方式 : GET
+2020-11-11 18:15:54.433 [http-nio-8080-exec-1] INFO  com.mzl.logbackdemo1.aop.LogAop - 请求ip : 0:0:0:0:0:0:0:1
+2020-11-11 18:15:54.433 [http-nio-8080-exec-1] INFO  com.mzl.logbackdemo1.aop.LogAop - 请求内容类型 : null
+2020-11-11 18:15:54.433 [http-nio-8080-exec-1] INFO  com.mzl.logbackdemo1.aop.LogAop - 请求参数 : [1]
+2020-11-11 18:15:54.434 [http-nio-8080-exec-1] INFO  com.mzl.logbackdemo1.aop.LogAop - 浏览器 : CHROME
+2020-11-11 18:15:54.434 [http-nio-8080-exec-1] INFO  com.mzl.logbackdemo1.aop.LogAop - 浏览器版本 : 75.0.3770.100
+2020-11-11 18:15:54.435 [http-nio-8080-exec-1] INFO  com.mzl.logbackdemo1.aop.LogAop - 操作系统: WINDOWS_10
+2020-11-11 18:15:54.447 [http-nio-8080-exec-1] INFO  com.mzl.logbackdemo1.controller.LogTestController - info的日志： 【1】
+2020-11-11 18:15:54.448 [http-nio-8080-exec-1] INFO  com.mzl.logbackdemo1.aop.LogAop - 请求结束时间 : 2020-11-11T18:15:54.448
+2020-11-11 18:15:54.448 [http-nio-8080-exec-1] INFO  com.mzl.logbackdemo1.aop.LogAop - 请求耗时 : 53
+2020-11-11 18:15:54.448 [http-nio-8080-exec-1] INFO  com.mzl.logbackdemo1.aop.LogAop - 请求返回 : 1

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>查看图像</title>
+</head>
+<body>
+<form action="/viewImg" method="post" enctype="multipart/form-data">
+    <div>
+        <label>图片Id:</label>
+        <input type="text" name="id" placeholder="请输入图片id"/>
+    </div>
+    <input type="submit" value="确定"/>
+</form>
+<p>图片显示：</p>
+<img th:src="@{${path}}">
+</body>
+</html>

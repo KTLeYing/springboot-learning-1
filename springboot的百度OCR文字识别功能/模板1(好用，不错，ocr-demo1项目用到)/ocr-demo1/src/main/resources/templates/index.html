@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>文字识别</title>
+
+    <script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+
+<body>
+<h1>文字识别<!--<p th:text="'我是文本输出'"></p>--></h1>
+<form enctype="multipart/form-data" id="ocr-form" action="/ocr" method="post">
+    <div class="col-sm-4">
+        <div class="form-group">
+            <input type="file" name="file" id="file1" class="file">
+        </div>
+        <input type="submit" value="提交">
+    </div>
+    <div class="col-sm-4">
+        <h2>解析结果：</h2>
+        <span th:utext="${res}"></span>
+    </div>
+</form>
+</body>
+
+</html>
