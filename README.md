@@ -39,4 +39,4 @@ SpringBoot整合框架各种实用的组件技术点，纯属个人技术积累�
 
 
 ### 欢迎关注个人公众号  
-CSDN博客：https://editor.csdn.net/md/?articleId=114862253
+CSDN博客：https://blog.csdn.net/weixin_43548310/article/details/114862253
