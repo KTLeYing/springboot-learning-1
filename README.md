@@ -68,6 +68,7 @@ SpringBoot整合框架各种实用的组件技术点以及一些框架重要技�
 | SpringBoot-自定义.yml文件配置 | ----- | SpringBoot整合自定义的.yml文件配置和使用的实例|
 | SpringBoot-QQ授权登录 | ----- | SpringBoot实现QQ授权登录案例 |
 | SpringBoot-微信授权登录 | ----- | SpringBoot实现微信授权登录案例 |
+| SpringBoot-Alipay(支付宝) | ----- | SpringBoot实现支付宝支付功能案例 | 
 | SpringBoot-滑动验证 | ----- | SpringBoot实现滑动验证码案例 |
 | SpringBoot-UEditor | ----- | SpringBoot整合百度的UEditor实现富文本编辑案例，Springboot+Vue前后端分离来实现 |
 | SpringBoot-生成二维码 | ----- | SpringBoot实现二维码的生成，包括使用Google的二维码依赖和Hutoold的二维码依赖来实现 |
