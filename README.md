@@ -85,5 +85,5 @@ SpringBoot整合框架各种实用的组件技术点以及一些框架重要技�
 | Springboot项目汇集 | ----- | 本人的Springboot项目的汇集记录（方便自己以后查找） |
 
 
-### 欢迎关注个人公众号  
-CSDN博客：https://blog.csdn.net/weixin_43548310/article/details/114862253
+### 欢迎关注个人博客  
+CSDN博客：https://blog.csdn.net/weixin_43548310/article/details/114988179
